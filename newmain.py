@@ -50,14 +50,12 @@ label_dict = {
 #Only works with %matplotlib inline - requires IPython
 #Displays 2 images
 '''plt.figure(figsize=[5,5])
-
 # Display the first image in training data
 plt.subplot(121)
 curr_img = np.reshape(data.train.images[0], (28,28))
 curr_lbl = np.argmax(data.train.labels[0,:])
 plt.imshow(curr_img, cmap='gray')
 plt.title("(Label: " + str(label_dict[curr_lbl]) + ")")
-
 # Display the first image in testing data
 plt.subplot(122)
 curr_img = np.reshape(data.test.images[0], (28,28))
@@ -66,10 +64,18 @@ plt.imshow(curr_img, cmap='gray')
 plt.title("(Label: " + str(label_dict[curr_lbl]) + ")")'''
 
 # Gives matrix version of image '0'
-print(data.train.images[0])
+#  print(data.train.images[0]) <--- returns a long vector
+
 # Prints largest value, should be 1
-print(np.max(data.train.images[0]))
+#print(np.max(data.train.images[0]))
 
 #Prints smallest value, should be 0
-print(np.min(data.train.images[0]))
+#print(np.min(data.train.images[0]))
 
+#Reshapes each image into a vector
+# The '-1' means that it infers the batch size
+train_X = data.train.images.reshape(-1,28,28,1)
+test_X = data.test.images.reshape(-1,28,28,30)
+
+# Should return 'batch size' (inferred) by 28 by 28 by 1
+print (train_X.shape, test_X.shape)
