@@ -92,7 +92,7 @@ print (train_X.shape, test_X.shape)
 
 # Extracts 'test' dataset
 train_y = data.train.labels
-test_y = data.train.labels
+test_y = data.test.labels
 
 print (train_y.shape, test_y.shape)
 
@@ -208,24 +208,31 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 #Initialize all variables
 init = tf.global_variables_initializer()
 
-with tf.Session as sess:
-	#Start computational graph
-	sess.run(init)
-	train_loss = []
-	test_loss = []
-	train_accuracy = []
-	test_loss = []
-	summary_writer = tf.summary.FileWriter('./Output',sess.graph)
-	for i in range(training_iter):
-		for batch in range(len(train_X)//batch_size):
-			batch_x = train_X[batch*batch_size:min(batch+1)*batch_size,len(train_X)]
-			batch_y = train_y[batch*batch_size:min(batch+1)*batch_size,len(train_y)]
-			#Runs backpropagation
-			#Feeds placeholder x and y
-			opt = sess.run(optimizer, feed_dict = {x:batch_x, y:batch_y})
-			#Runs Evaluation
-			loss, acc = sess.run([cost, accuracy], feed_dict={x:batch_x,y:batch_y})
-		print ('Iter ' + str(i))
-		print ('Optimazion finished') 
-
-		
+sess = tf.Session()
+#Start computational graph
+sess.run(init)
+train_loss = []
+test_loss = []
+train_accuracy = []
+test_loss = []
+summary_writer = tf.summary.FileWriter('./Output',sess.graph)
+for i in range(training_iter):
+	for batch in range(len(train_X)//batch_size):
+		batch_x = train_X[batch*batch_size:min((batch+1)*batch_size,len(train_X))]
+		batch_y = train_y[batch*batch_size:min((batch+1)*batch_size,len(train_y))]
+		#Runs backpropagation
+		#Feeds placeholder x and y
+		opt = sess.run(optimizer, feed_dict = {x:batch_x, y:batch_y})
+		#Runs Evaluation
+		if batch %100 ==0:
+			print (batch)
+	#Loss and accuracy for train set
+	loss, acc = sess.run([cost, accuracy], feed_dict={x:train_X, y:train_y})
+	#Loss and accuracy for test set
+	test_loss, valid_acc = sess.run([cost,accuracy], feed_dict={x:test_X,y:test_y})
+	print ('Iter ' + str(i))
+	print ('Optimazion finished') 
+	print ('Training Loss: ' + str(loss))
+	print ('Training Accuracy: ' + str(acc))
+	print ('Test Loss: ' + str(test_loss))
+	print ('Test Accuracy: ' +str(valid_acc))
