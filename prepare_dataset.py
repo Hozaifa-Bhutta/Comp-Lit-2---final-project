@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import os
 
-IMG_DIR = 'Banana'
+IMG_DIR = 'full_vid'
 
 for img in os.listdir(IMG_DIR):
         img_array = cv2.imread(os.path.join(IMG_DIR,img), cv2.IMREAD_GRAYSCALE)
@@ -13,6 +13,6 @@ for img in os.listdir(IMG_DIR):
 
         print(img_array)
 
-        with open('banana_pics.csv', 'ab') as f:
+        with open('full.csv', 'ab') as f:
 
             np.savetxt(f, img_array, delimiter=",")
