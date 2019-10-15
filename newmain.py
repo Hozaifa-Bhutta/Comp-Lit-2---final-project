@@ -1,7 +1,7 @@
 #newmain.py
 #This should be the main model where the training occurs
 # Import libraries
-
+import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -10,7 +10,8 @@ from tensorflow.examples.tutorials.mnist import input_data
 # Only works for IPython --->      %matplotlib inline
 #To run 'magic'
 import os
-
+import random
+from reads_csv import read_file
 
 #os.environ["CUDA_VISIBLE_DEVICES"]="0" #for training on gpu
 #Imports data from tensorflow library 'input_data'. one_hot transforms categorical labels into binary vectors
@@ -22,15 +23,15 @@ data = input_data.read_data_sets('data/fashion', one_hot = True)
 #All images are scaled between 0-1 in this dataset. In artifical dataset we need to scale it down to this value
 
 # Shapes of training set
-print("Training set (images) shape: {shape}".format(shape=data.train.images.shape))
-print("Training set (labels) shape: {shape}".format(shape=data.train.labels.shape))
+#print("Training set (images) shape: {shape}".format(shape=data.train.images.shape))
+#print("Training set (labels) shape: {shape}".format(shape=data.train.labels.shape))
 
 #New line
-print ('\n')
+#print ('\n')
 
 # Shapes of test set
-print("Test set (images) shape: {shape}".format(shape=data.test.images.shape))
-print("Test set (labels) shape: {shape}".format(shape=data.test.labels.shape))
+#print("Test set (images) shape: {shape}".format(shape=data.test.images.shape))
+#print("Test set (labels) shape: {shape}".format(shape=data.test.labels.shape))
 
 # Create dictionary of target classes
 # This will be changed later on into 41 different Phonemes plus 'silence'
@@ -48,21 +49,6 @@ label_dict = {
 }
 
 
-#Only works with %matplotlib inline - requires IPython
-#Displays 2 images
-'''plt.figure(figsize=[5,5])
-# Display the first image in training data
-plt.subplot(121)
-curr_img = np.reshape(data.train.images[0], (28,28))
-curr_lbl = np.argmax(data.train.labels[0,:])
-plt.imshow(curr_img, cmap='gray')
-plt.title("(Label: " + str(label_dict[curr_lbl]) + ")")
-# Display the first image in testing data
-plt.subplot(122)
-curr_img = np.reshape(data.test.images[0], (28,28))
-curr_lbl = np.argmax(data.test.labels[0,:])
-plt.imshow(curr_img, cmap='gray')
-plt.title("(Label: " + str(label_dict[curr_lbl]) + ")")'''
 
 # Gives vector version of image '0'
 #  print(data.train.images[0]) <--- returns a long vector
@@ -88,13 +74,13 @@ print (z.shape)'''
 
 
 # Should return 'batch size' (inferred) by 28 by 28 by 1
-print (train_X.shape, test_X.shape)
+#print (train_X.shape, test_X.shape)
 
 # Extracts 'test' dataset
 train_y = data.train.labels
 test_y = data.test.labels
 
-print (train_y.shape, test_y.shape)
+#print (train_y.shape, test_y.shape)
 
 training_iter = 200
 #Start off at 0.001, then 0.003, then 0.01 etc...
@@ -107,7 +93,7 @@ n_classes = 10
 
 #two placeholders, x and y
 #First value is left as 'None' as it'll be defined later on as 'batch_size'
-x = tf.placeholder('float', [None, 28, 28, 1])
+x = tf.placeholder('float', [None, 480, 480, 1])
 y = tf.placeholder('float', [None, n_classes])
 
 
@@ -143,7 +129,7 @@ weights = {
 	#For fully conncected
 	#Shape first parameter equals result of previous output
 	#4 by 4 image with 128 channels
-	'wd1': tf.get_variable('W3', shape = (4*4*128, 128), initializer= tf.contrib.layers.xavier_initializer()),
+	'wd1': tf.get_variable('W3', shape = (60*60*128, 128), initializer= tf.contrib.layers.xavier_initializer()),
 	# For output
 	'out': tf.get_variable('W4', shape = (128, n_classes), initializer= tf.contrib.layers.xavier_initializer())
 }
@@ -156,7 +142,7 @@ biases = {
 	'bc2':tf.get_variable('B1', shape = 64, initializer=tf.contrib.layers.xavier_initializer()),
 	'bc3':tf.get_variable('B2', shape = 128, initializer=tf.contrib.layers.xavier_initializer()),
 	'bd1':tf.get_variable('B3', shape = 128, initializer=tf.contrib.layers.xavier_initializer()),
-	'out':tf.get_variable('B4', shape = 10, initializer=tf.contrib.layers.xavier_initializer())
+	'out':tf.get_variable('B4', shape = n_classes, initializer=tf.contrib.layers.xavier_initializer())
 }
 
 
@@ -216,23 +202,30 @@ test_loss = []
 train_accuracy = []
 test_loss = []
 summary_writer = tf.summary.FileWriter('./Output',sess.graph)
-for i in range(training_iter):
-	for batch in range(len(train_X)//batch_size):
-		batch_x = train_X[batch*batch_size:min((batch+1)*batch_size,len(train_X))]
-		batch_y = train_y[batch*batch_size:min((batch+1)*batch_size,len(train_y))]
+for i in range(1):
+	for batch in range(1):
+		fake_batch_x = []
+		#batch_x = train_X[batch*batch_size:min((batch+1)*batch_size,len(train_X))]
+		batch_y = train_y[0:2]
 		#Runs backpropagation
 		#Feeds placeholder x and y
+		for training_ex in range(2):
+			z=random.randint(20,200)
+			file = read_file('full.csv', z)
+			file = np.reshape(file,[-1,480,480,1])
+			fake_batch_x.append(file)
+		batch_x = np.concatenate((fake_batch_x[0],fake_batch_x[1]))
 		opt = sess.run(optimizer, feed_dict = {x:batch_x, y:batch_y})
 		#Runs Evaluation
 		if batch %100 ==0:
 			print (batch)
 	#Loss and accuracy for train set
-	loss, acc = sess.run([cost, accuracy], feed_dict={x:train_X, y:train_y})
+	loss, acc = sess.run([cost, accuracy], feed_dict={x:batch_x, y:batch_y})
 	#Loss and accuracy for test set
-	test_loss, valid_acc = sess.run([cost,accuracy], feed_dict={x:test_X,y:test_y})
+	#test_loss, valid_acc = sess.run([cost,accuracy], feed_dict={x:test_X,y:test_y})
 	print ('Iter ' + str(i))
 	print ('Optimazion finished') 
 	print ('Training Loss: ' + str(loss))
 	print ('Training Accuracy: ' + str(acc))
-	print ('Test Loss: ' + str(test_loss))
-	print ('Test Accuracy: ' +str(valid_acc))
+	#print ('Test Loss: ' + str(test_loss))
+	#print ('Test Accuracy: ' +str(valid_acc))
