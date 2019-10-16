@@ -230,7 +230,8 @@ for i in range(training_iter):
 			else:
 				batch_x = np.concatenate((fake_batch_x[0], fake_batch_x[1]))
 		assistant_y = np.zeros((3,2))
-		batch_y = assistant_y[np.arange(2),assistant_y] = 1
+		batch_y = assistant_y[np.arange(3),fake_batch_y] = 1
+		batch_y = assistant_y
 		opt = sess.run(optimizer, feed_dict = {x:batch_x, y:batch_y})
 		prediction = sess.run(pred, feed_dict = {x:batch_x})
 		print (prediction)
