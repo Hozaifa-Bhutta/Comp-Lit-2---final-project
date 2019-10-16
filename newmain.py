@@ -89,7 +89,7 @@ learning_rate = 0.001
 batch_size = 64
 
 #Number of classes - 41 in real dataset
-n_classes = 10
+n_classes = 2
 
 #two placeholders, x and y
 #First value is left as 'None' as it'll be defined later on as 'batch_size'
@@ -202,20 +202,39 @@ test_loss = []
 train_accuracy = []
 test_loss = []
 summary_writer = tf.summary.FileWriter('./Output',sess.graph)
-for i in range(1):
-	for batch in range(1):
+for i in range(training_iter):
+	for batch in range(len(train_X)//batch_size):
 		fake_batch_x = []
+		fake_batch_y = np.array([])
 		#batch_x = train_X[batch*batch_size:min((batch+1)*batch_size,len(train_X))]
-		batch_y = train_y[0:2]
+		print (type(train_y))
+		
+		'''a = np.array([0,1])
+		b = np.zeros((2, 2))
+		b[np.arange(2), a] = 1'''
+		
 		#Runs backpropagation
 		#Feeds placeholder x and y
-		for training_ex in range(2):
-			z=random.randint(20,200)
+		for training_ex in range(3):
+			z = random.randint(10,1190)
 			file = read_file('full.csv', z)
 			file = np.reshape(file,[-1,480,480,1])
 			fake_batch_x.append(file)
-		batch_x = np.concatenate((fake_batch_x[0],fake_batch_x[1]))
+			if z <= 599:
+				fake_batch_y = np.append(fake_batch_y, [0])
+			else:
+				fake_batch_y = np.append(fake_batch_y, [1])
+		for fake_i in range(3):
+			if fake_i != 0 and i != 1:
+				batch_x = np.concatenate((batch_x, fake_batch_x[i]))
+			else:
+				batch_x = np.concatenate((fake_batch_x[0], fake_batch_x[1]))
+		assistant_y = np.zeros((3,2))
+		batch_y = assistant_y[np.arange(2),assistant_y] = 1
 		opt = sess.run(optimizer, feed_dict = {x:batch_x, y:batch_y})
+		prediction = sess.run(pred, feed_dict = {x:batch_x})
+		print (prediction)
+		print (batch_y)
 		#Runs Evaluation
 		if batch %100 ==0:
 			print (batch)
