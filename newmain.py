@@ -205,7 +205,7 @@ summary_writer = tf.summary.FileWriter('./Output',sess.graph)
 for i in range(training_iter):
 	for batch in range(len(train_X)//batch_size):
 		fake_batch_x = []
-		fake_batch_y = np.array([])
+		fake_batch_y = []
 		#batch_x = train_X[batch*batch_size:min((batch+1)*batch_size,len(train_X))]
 		print (type(train_y))
 		
@@ -221,15 +221,16 @@ for i in range(training_iter):
 			file = np.reshape(file,[-1,480,480,1])
 			fake_batch_x.append(file)
 			if z <= 599:
-				fake_batch_y = np.append(fake_batch_y, [0])
+				fake_batch_y.append(0)
 			else:
-				fake_batch_y = np.append(fake_batch_y, [1])
+				fake_batch_y.append(1)
 		for fake_i in range(3):
-			if fake_i != 0 and i != 1:
-				batch_x = np.concatenate((batch_x, fake_batch_x[i]))
+			if fake_i == 0:
+				batch_x = fake_batch_x[0]
 			else:
-				batch_x = np.concatenate((fake_batch_x[0], fake_batch_x[1]))
+				batch_x = np.concatenate((batch_x, fake_batch_x[i]))
 		assistant_y = np.zeros((3,2))
+		fake_batch_y = np.array(fake_batch_y)
 		batch_y = assistant_y[np.arange(3),fake_batch_y] = 1
 		batch_y = assistant_y
 		opt = sess.run(optimizer, feed_dict = {x:batch_x, y:batch_y})
