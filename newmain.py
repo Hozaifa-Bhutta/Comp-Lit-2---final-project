@@ -12,12 +12,28 @@ from tensorflow.examples.tutorials.mnist import input_data
 import os
 import random
 from reads_csv import read_file
+import csv
 
+IMG_DIR = 'full_vid'
+full_list = []
+for img in os.listdir(IMG_DIR):
+		img_array = cv2.imread(os.path.join(IMG_DIR,img), cv2.IMREAD_GRAYSCALE)
+
+		img_array = (img_array.flatten())
+
+		img_array  = img_array.reshape(-1, 1).T
+		img_array = list(img_array[0])
+		for i in range(0,len(img_array)):
+			img_array[i] = float(img_array[i])*(1/255)
+		full_list.append((img_array))
+print (full_list[0])
+#Maximum is 255
+#Minimum is 0
 #os.environ["CUDA_VISIBLE_DEVICES"]="0" #for training on gpu
 #Imports data from tensorflow library 'input_data'. one_hot transforms categorical labels into binary vectors
 '''one_hot - In one-hot encoding, you convert the categorical data into a vector of numbers. You do this because machine learning algorithms can't work with categorical data directly. 
 Instead, you generate one boolean column for each category or class. Only one of these columns could take on the value 1 for each sample. That explains the term "one-hot encoding".'''
-data = input_data.read_data_sets('data/fashion', one_hot = True)
+#data = input_data.read_data_sets('data/fashion', one_hot = True)
 
 
 #All images are scaled between 0-1 in this dataset. In artifical dataset we need to scale it down to this value
@@ -61,8 +77,8 @@ label_dict = {
 
 #Reshapes each image into a vector
 # The '-1' means that it infers the batch size
-train_X = data.train.images.reshape(-1,28,28,1)
-test_X = data.test.images.reshape(-1,28,28,1)
+#train_X = data.train.images.reshape(-1,28,28,1)
+#test_X = data.test.images.reshape(-1,28,28,1)
 
 
 '''
@@ -77,8 +93,8 @@ print (z.shape)'''
 #print (train_X.shape, test_X.shape)
 
 # Extracts 'test' dataset
-train_y = data.train.labels
-test_y = data.test.labels
+#train_y = data.train.labels
+#test_y = data.test.labels
 
 #print (train_y.shape, test_y.shape)
 
@@ -173,6 +189,7 @@ def conv_net(x, weights, biases):
 
 	#Output layer
 	out = tf.add(tf.matmul(fc1,weights['out']), biases['out'])
+	print (out.shape)
 	return out
 
 # Predictions are  stored here
@@ -203,11 +220,10 @@ train_accuracy = []
 test_loss = []
 summary_writer = tf.summary.FileWriter('./Output',sess.graph)
 for i in range(training_iter):
-	for batch in range(len(train_X)//batch_size):
+	for batch in range(1194//batch_size):
 		fake_batch_x = []
 		fake_batch_y = []
 		#batch_x = train_X[batch*batch_size:min((batch+1)*batch_size,len(train_X))]
-		print (type(train_y))
 		
 		'''a = np.array([0,1])
 		b = np.zeros((2, 2))
@@ -215,28 +231,26 @@ for i in range(training_iter):
 		
 		#Runs backpropagation
 		#Feeds placeholder x and y
-		for training_ex in range(3):
+		for training_ex in range(batch_size):
 			z = random.randint(10,1190)
-			file = read_file('full.csv', z)
+			file = np.array(full_list[z])
 			file = np.reshape(file,[-1,480,480,1])
 			fake_batch_x.append(file)
 			if z <= 599:
 				fake_batch_y.append(0)
 			else:
 				fake_batch_y.append(1)
-		for fake_i in range(3):
+		for fake_i in range(batch_size):
 			if fake_i == 0:
 				batch_x = fake_batch_x[0]
 			else:
-				batch_x = np.concatenate((batch_x, fake_batch_x[i]))
-		assistant_y = np.zeros((3,2))
+				batch_x = np.concatenate((batch_x, fake_batch_x[fake_i]))
+		assistant_y = np.zeros((batch_size,2))
 		fake_batch_y = np.array(fake_batch_y)
-		batch_y = assistant_y[np.arange(3),fake_batch_y] = 1
+		batch_y = assistant_y[np.arange(batch_size),fake_batch_y] = 1
 		batch_y = assistant_y
 		opt = sess.run(optimizer, feed_dict = {x:batch_x, y:batch_y})
 		prediction = sess.run(pred, feed_dict = {x:batch_x})
-		print (prediction)
-		print (batch_y)
 		#Runs Evaluation
 		if batch %100 ==0:
 			print (batch)
