@@ -255,6 +255,10 @@ for i in range(training_iter):
 		if batch %100 ==0:
 			print (batch)
 	#Loss and accuracy for train set
+	#FIX THIS!
+	#FIX THIS!
+	#FIX THIS!
+	#More than just batch
 	loss, acc = sess.run([cost, accuracy], feed_dict={x:batch_x, y:batch_y})
 	#Loss and accuracy for test set
 	#test_loss, valid_acc = sess.run([cost,accuracy], feed_dict={x:test_X,y:test_y})
