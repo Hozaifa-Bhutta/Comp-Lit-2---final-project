@@ -139,13 +139,13 @@ weights = {
 	#'shape' parameters - filter size, input dimension, output dimension
 
 	#Convolution
-	'wc1': tf.get_variable('W0', shape = (3,3,1,32), initializer= tf.contrib.layers.xavier_initializer()),
-	'wc2': tf.get_variable('W1', shape = (3,3,32,64), initializer= tf.contrib.layers.xavier_initializer()),
-	'wc3': tf.get_variable('W2', shape = (3,3,64,128), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc1': tf.get_variable('W0', shape = (3,3,30,60), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc2': tf.get_variable('W1', shape = (3,3,32,120), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc3': tf.get_variable('W2', shape = (3,3,64,240), initializer= tf.contrib.layers.xavier_initializer()),
 	#For fully conncected
 	#Shape first parameter equals result of previous output
 	#4 by 4 image with 128 channels
-	'wd1': tf.get_variable('W3', shape = (60*60*128, 128), initializer= tf.contrib.layers.xavier_initializer()),
+	'wd1': tf.get_variable('W3', shape = (60*60*240, 128), initializer= tf.contrib.layers.xavier_initializer()),
 	# For output
 	'out': tf.get_variable('W4', shape = (128, n_classes), initializer= tf.contrib.layers.xavier_initializer())
 }
@@ -154,9 +154,9 @@ biases = {
 	#All the biases for the NN model
 	#Just like the weights, these values must be intialized
 
-	'bc1':tf.get_variable('B0', shape = 32, initializer=tf.contrib.layers.xavier_initializer()),
-	'bc2':tf.get_variable('B1', shape = 64, initializer=tf.contrib.layers.xavier_initializer()),
-	'bc3':tf.get_variable('B2', shape = 128, initializer=tf.contrib.layers.xavier_initializer()),
+	'bc1':tf.get_variable('B0', shape = 60, initializer=tf.contrib.layers.xavier_initializer()),
+	'bc2':tf.get_variable('B1', shape = 120, initializer=tf.contrib.layers.xavier_initializer()),
+	'bc3':tf.get_variable('B2', shape = 240, initializer=tf.contrib.layers.xavier_initializer()),
 	'bd1':tf.get_variable('B3', shape = 128, initializer=tf.contrib.layers.xavier_initializer()),
 	'out':tf.get_variable('B4', shape = n_classes, initializer=tf.contrib.layers.xavier_initializer())
 }
@@ -232,10 +232,15 @@ for i in range(training_iter):
 		#Runs backpropagation
 		#Feeds placeholder x and y
 		for training_ex in range(batch_size):
-			z = random.randint(10,1190)
-			file = np.array(full_list[z])
-			file = np.reshape(file,[-1,480,480,1])
-			fake_batch_x.append(file)
+			z = random.randint(20,1170)
+			frames = []
+			for frame_index in range((z-14),(z+14)):
+				frame = np.array(full_list[frame_index])
+				file = np.reshape(file,[-1,480,480,1])
+				frames.append[file]
+			real_training_ex = np.concatenate((frames[0], frames[1], frames[2], frames[3], frames[4], frames[5], frames[6], frames[7], frames[8], frames[9], frames[10], frames[11], frames[12],frames[13], frames[14], frames[15], frames[16], frames[17], frames[18], frames[19], frames[20], frames[21], frames[22], frames[23], frames[24], frames[25], frames[26], frames[27], frames[28], frames[29]),3)        ,, 
+
+			fake_batch_x.append(real_training_ex)
 			if z <= 599:
 				fake_batch_y.append(0)
 			else:
