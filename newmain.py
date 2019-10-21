@@ -238,7 +238,7 @@ for i in range(training_iter):
 				frame = np.array(full_list[frame_index])
 				file = np.reshape(file,[-1,480,480,1])
 				frames.append[file]
-			real_training_ex = np.concatenate((frames[0], frames[1], frames[2], frames[3], frames[4], frames[5], frames[6], frames[7], frames[8], frames[9], frames[10], frames[11], frames[12],frames[13], frames[14], frames[15], frames[16], frames[17], frames[18], frames[19], frames[20], frames[21], frames[22], frames[23], frames[24], frames[25], frames[26], frames[27], frames[28], frames[29]),3)        ,, 
+			real_training_ex = np.concatenate((frames[0], frames[1], frames[2], frames[3], frames[4], frames[5], frames[6], frames[7], frames[8], frames[9], frames[10], frames[11], frames[12],frames[13], frames[14], frames[15], frames[16], frames[17], frames[18], frames[19], frames[20], frames[21], frames[22], frames[23], frames[24], frames[25], frames[26], frames[27], frames[28], frames[29]),3)       
 
 			fake_batch_x.append(real_training_ex)
 			if z <= 599:
