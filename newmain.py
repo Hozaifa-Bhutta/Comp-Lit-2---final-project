@@ -109,7 +109,7 @@ n_classes = 2
 
 #two placeholders, x and y
 #First value is left as 'None' as it'll be defined later on as 'batch_size'
-x = tf.placeholder('float', [None, 480, 480, 1])
+x = tf.placeholder('float', [None, 480, 480, None])
 y = tf.placeholder('float', [None, n_classes])
 
 
