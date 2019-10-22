@@ -1,5 +1,4 @@
 def makearray(file):
-    import numpy as np
     import json
     f = open(file)
     #make the json file a dictionary
@@ -10,7 +9,6 @@ def makearray(file):
 
 
 def makelabel(file, output):
-    import numpy as np
     import json
     f = open(file)
     #make the json file a dictionary
