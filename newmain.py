@@ -1,4 +1,5 @@
 #newmain.py
+#YOU WERE WORKING ON CHANGING THE MODEL
 #This should be the main model where the training occurs
 # Import libraries
 import cv2
@@ -23,8 +24,8 @@ for img in os.listdir(IMG_DIR):
 
 		img_array  = img_array.reshape(-1, 1).T
 		img_array = list(img_array[0])
-		for i in range(0,len(img_array)):
-			img_array[i] = float(img_array[i])*(1/255)
+		#for i in range(0,len(img_array)):
+		#	img_array[i] = float(img_array[i])*(1/255)
 		full_list.append((img_array))
 print (full_list[0])
 #Maximum is 255
@@ -139,26 +140,32 @@ weights = {
 	#'shape' parameters - filter size, input dimension, output dimension
 
 	#Convolution
-	'wc1': tf.get_variable('W0', shape = (3,3,30,60), initializer= tf.contrib.layers.xavier_initializer()),
-	'wc2': tf.get_variable('W1', shape = (3,3,32,120), initializer= tf.contrib.layers.xavier_initializer()),
-	'wc3': tf.get_variable('W2', shape = (3,3,64,240), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc1': tf.get_variable('W0', shape = (3,3,29,58), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc2': tf.get_variable('W1', shape = (3,3,58,116), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc3': tf.get_variable('W2', shape = (3,3,116,232), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc4': tf.get_variable('W3', shape = (3,3,232,464), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc5': tf.get_variable('W4', shape = (3,3,464,464), initializer= tf.contrib.layers.xavier_initializer()),
+
 	#For fully conncected
 	#Shape first parameter equals result of previous output
 	#4 by 4 image with 128 channels
-	'wd1': tf.get_variable('W3', shape = (60*60*240, 128), initializer= tf.contrib.layers.xavier_initializer()),
+	'wd1': tf.get_variable('W5', shape = (15*15*464, 116), initializer= tf.contrib.layers.xavier_initializer()),
 	# For output
-	'out': tf.get_variable('W4', shape = (128, n_classes), initializer= tf.contrib.layers.xavier_initializer())
+	'out': tf.get_variable('W6', shape = (116, n_classes), initializer= tf.contrib.layers.xavier_initializer())
 }
 
 biases = {
 	#All the biases for the NN model
 	#Just like the weights, these values must be intialized
 
-	'bc1':tf.get_variable('B0', shape = 60, initializer=tf.contrib.layers.xavier_initializer()),
-	'bc2':tf.get_variable('B1', shape = 120, initializer=tf.contrib.layers.xavier_initializer()),
-	'bc3':tf.get_variable('B2', shape = 240, initializer=tf.contrib.layers.xavier_initializer()),
-	'bd1':tf.get_variable('B3', shape = 128, initializer=tf.contrib.layers.xavier_initializer()),
-	'out':tf.get_variable('B4', shape = n_classes, initializer=tf.contrib.layers.xavier_initializer())
+	'bc1':tf.get_variable('B0', shape = 58, initializer=tf.contrib.layers.xavier_initializer()),
+	'bc2':tf.get_variable('B1', shape = 116, initializer=tf.contrib.layers.xavier_initializer()),
+	'bc3':tf.get_variable('B2', shape = 232, initializer=tf.contrib.layers.xavier_initializer()),
+	'bc4':tf.get_variable('B3', shape = 464, initializer=tf.contrib.layers.xavier_initializer()),
+	'bc5':tf.get_variable('B4', shape = 464, initializer=tf.contrib.layers.xavier_initializer()),
+
+	'bd1':tf.get_variable('B5', shape = 116, initializer=tf.contrib.layers.xavier_initializer()),
+	'out':tf.get_variable('B6', shape = n_classes, initializer=tf.contrib.layers.xavier_initializer())
 }
 
 
@@ -170,7 +177,7 @@ def conv_net(x, weights, biases):
 
 	# Performs max_pooling. Calls maxpooling function defined above
 	conv1 = maxpool2d(conv1)
-
+	print (conv1.shape)
 	#Covloution layer 2 
 	conv2 = conv2d(conv1, weights['wc2'], biases['bc2'])
 	conv2 = maxpool2d(conv2)
@@ -178,6 +185,12 @@ def conv_net(x, weights, biases):
 	#Convloution layer 3
 	conv3 = conv2d(conv2, weights['wc3'], biases['bc3'])
 	conv3 = maxpool2d(conv3)
+	#Convloution layer 4
+	conv4 = conv2d(conv3, weights['wc3'], biases['bc3'])
+	conv4 = maxpool2d(conv4)
+	#Convloution layer 5
+	conv5 = conv2d(conv4, weights['wc3'], biases['bc3'])
+	conv5 = maxpool2d(conv5)
 
 	#Fully connected layer
 	# Reshapes last layer accordingly
@@ -234,11 +247,11 @@ for i in range(training_iter):
 		for training_ex in range(batch_size):
 			z = random.randint(20,1170)
 			frames = []
-			for frame_index in range((z-14),(z+14)):
+			for frame_index in range((z-14),(z+15)):
 				frame = np.array(full_list[frame_index])
-				file = np.reshape(file,[-1,480,480,1])
-				frames.append[file]
-			real_training_ex = np.concatenate((frames[0], frames[1], frames[2], frames[3], frames[4], frames[5], frames[6], frames[7], frames[8], frames[9], frames[10], frames[11], frames[12],frames[13], frames[14], frames[15], frames[16], frames[17], frames[18], frames[19], frames[20], frames[21], frames[22], frames[23], frames[24], frames[25], frames[26], frames[27], frames[28], frames[29]),3)       
+				file = np.reshape(frame,[-1,480,480,1])
+				frames.append(file)
+			real_training_ex = np.concatenate((frames[0], frames[1], frames[2], frames[3], frames[4], frames[5], frames[6], frames[7], frames[8], frames[9], frames[10], frames[11], frames[12],frames[13], frames[14], frames[15], frames[16], frames[17], frames[18], frames[19], frames[20], frames[21], frames[22], frames[23], frames[24], frames[25], frames[26], frames[27], frames[28]),3)       
 
 			fake_batch_x.append(real_training_ex)
 			if z <= 599:
