@@ -107,10 +107,10 @@ batch_size = 64
 
 #Number of classes - 41 in real dataset
 n_classes = 2
-
+n_channels = 29
 #two placeholders, x and y
 #First value is left as 'None' as it'll be defined later on as 'batch_size'
-x = tf.placeholder('float', [None, 480, 480, 29])
+x = tf.placeholder('float', [None, 480, 480, n_channels])
 y = tf.placeholder('float', [None, n_classes])
 
 
@@ -140,7 +140,7 @@ weights = {
 	#'shape' parameters - filter size, input dimension, output dimension
 
 	#Convolution
-	'wc1': tf.get_variable('W0', shape = (3,3,29,58), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc1': tf.get_variable('W0', shape = (3,3,n_channels,58), initializer= tf.contrib.layers.xavier_initializer()),
 	'wc2': tf.get_variable('W1', shape = (3,3,58,116), initializer= tf.contrib.layers.xavier_initializer()),
 	'wc3': tf.get_variable('W2', shape = (3,3,116,232), initializer= tf.contrib.layers.xavier_initializer()),
 	'wc4': tf.get_variable('W3', shape = (3,3,232,464), initializer= tf.contrib.layers.xavier_initializer()),
