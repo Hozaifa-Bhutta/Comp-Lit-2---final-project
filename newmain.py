@@ -110,7 +110,7 @@ n_classes = 2
 
 #two placeholders, x and y
 #First value is left as 'None' as it'll be defined later on as 'batch_size'
-x = tf.placeholder('float', [None, 480, 480, None])
+x = tf.placeholder('float', [None, 480, 480, 29])
 y = tf.placeholder('float', [None, n_classes])
 
 
@@ -186,17 +186,17 @@ def conv_net(x, weights, biases):
 	conv3 = conv2d(conv2, weights['wc3'], biases['bc3'])
 	conv3 = maxpool2d(conv3)
 	#Convloution layer 4
-	conv4 = conv2d(conv3, weights['wc3'], biases['bc3'])
+	conv4 = conv2d(conv3, weights['wc4'], biases['b4'])
 	conv4 = maxpool2d(conv4)
 	#Convloution layer 5
-	conv5 = conv2d(conv4, weights['wc3'], biases['bc3'])
+	conv5 = conv2d(conv4, weights['wc5'], biases['bc5'])
 	conv5 = maxpool2d(conv5)
 
 	#Fully connected layer
 	# Reshapes last layer accordingly
-	conv3_flattened = tf.reshape(conv3,[-1, weights['wd1'].get_shape()[0]])
+	conv5_flattened = tf.reshape(conv5,[-1, weights['wd1'].get_shape()[0]])
 	#Multiplies fc1 and 'wd1' and then adds it with bias
-	fc1 = tf.add(tf.matmul(conv3_flattened, weights['wd1']),biases['bd1'])
+	fc1 = tf.add(tf.matmul(conv5_flattened, weights['wd1']),biases['bd1'])
 	#Applies relu
 	fc1 = tf.nn.relu(fc1)
 
