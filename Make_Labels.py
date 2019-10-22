@@ -1,4 +1,5 @@
 def makearray(file):
+    import numpy as np
     import json
     f = open(file)
     #make the json file a dictionary
@@ -8,7 +9,8 @@ def makearray(file):
     return array
 
 
-def makelabel(file, output):
+def makelabel(file, framerate):
+    import numpy as np
     import json
     f = open(file)
     #make the json file a dictionary
@@ -29,15 +31,15 @@ def makelabel(file, output):
         phone_list = []
         #change this to make more efficient
         try:
+            phone_list += ['silence'] * int(framerate * (word['start'] - prev_word))
             for phoneme in word['phones']:
                 #add the phoneme to a temporary list and multiply it to get the number of frames right
                 phone = []
-                phone_frames = []
+                #phone_frames = []
                 phone.append(phoneme['phone'])
-                phone_frames += ['silence'] * int(30 * (word['start'] - prev_word))
-                phone_frames += phone * int(30 * float(phoneme['duration']))
-                phone_list += phone_frames
-                print(phone_frames)
+                #phone_frames += ['silence'] * int(30 * (word['start'] - prev_word))
+                phone *= int(framerate * float(phoneme['duration']))
+                phone_list += phone
             frame_phonemes += phone_list
             prev_word = word['end']
         except:
