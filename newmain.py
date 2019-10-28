@@ -270,8 +270,22 @@ for i in range(training_iter):
 		opt = sess.run(optimizer, feed_dict = {x:batch_x, y:batch_y})
 		prediction = sess.run(pred, feed_dict = {x:batch_x})
 		#Runs Evaluation
-		if batch %100 ==0:
+		if batch %2 ==0:
 			print (batch)
+			np.save('weight_1.npy', sess.run(weights['wc1']))
+			np.save('weight_2.npy', sess.run(weights['wc2']))
+			np.save('weight_3.npy', sess.run(weights['wc3']))
+			np.save('weight_4.npy', sess.run(weights['wc4']))
+			np.save('weight_5.npy', sess.run(weights['wc5']))
+			np.save('weight_wd1.npy', sess.run(weights['wd1']))
+			np.save('weight_out.npy', sess.run(weights['out']))
+			np.save('bias_1.npy', sess.run(biases['bc1']))
+			np.save('bias_2.npy', sess.run(biases['bc2']))
+			np.save('bias_3.npy', sess.run(biases['bc3']))
+			np.save('bias_4.npy', sess.run(biases['bc4']))
+			np.save('bias_5.npy', sess.run(biases['bc5']))
+			np.save('bias_wd1.npy', sess.run(biases['bd1']))
+			np.save('bias_out.npy', sess.run(biases['out']))
 	#Loss and accuracy for train set
 	#FIX THIS!
 	#FIX THIS!
