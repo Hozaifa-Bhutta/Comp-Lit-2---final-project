@@ -28,6 +28,11 @@ for img in os.listdir(IMG_DIR):
 		#	img_array[i] = float(img_array[i])*(1/255)
 		full_list.append((img_array))
 print (full_list[0])
+def read_img(img):
+	im = cv2.imread("/Users/Hozai/Desktop/audios/raw_pictures/"+img,1)
+	print (type(im)) #Print <class 'numpy.ndarray'>
+	print (im.size) #prints 2100000
+	return im
 #Maximum is 255
 #Minimum is 0
 #os.environ["CUDA_VISIBLE_DEVICES"]="0" #for training on gpu
@@ -248,7 +253,7 @@ for i in range(training_iter):
 			z = random.randint(20,1170)
 			frames = []
 			for frame_index in range((z-14),(z+15)):
-				frame = np.array(full_list[frame_index])
+				frame = read_img('foo'+str(frame_index)+'.png')
 				file = np.reshape(frame,[-1,480,480,1])
 				frames.append(file)
 			real_training_ex = np.concatenate((frames[0], frames[1], frames[2], frames[3], frames[4], frames[5], frames[6], frames[7], frames[8], frames[9], frames[10], frames[11], frames[12],frames[13], frames[14], frames[15], frames[16], frames[17], frames[18], frames[19], frames[20], frames[21], frames[22], frames[23], frames[24], frames[25], frames[26], frames[27], frames[28]),3)       
