@@ -14,10 +14,12 @@ import os
 import random
 from reads_csv import read_file
 import csv
+from frametoimg import framenumToimg
+import pandas as pd
 
 IMG_DIR = 'full_vid'
-full_list = []
-for img in os.listdir(IMG_DIR):
+#full_list = []
+'''for img in os.listdir(IMG_DIR):
 		img_array = cv2.imread(os.path.join(IMG_DIR,img), cv2.IMREAD_GRAYSCALE)
 
 		img_array = (img_array.flatten())
@@ -27,7 +29,7 @@ for img in os.listdir(IMG_DIR):
 		#for i in range(0,len(img_array)):
 		#	img_array[i] = float(img_array[i])*(1/255)
 		full_list.append((img_array))
-print (full_list[0])
+print (full_list[0])'''
 def read_img(img):
 	im = cv2.imread("/Users/Hozai/Desktop/audios/raw_pictures/"+img,1)
 	print (type(im)) #Print <class 'numpy.ndarray'>
@@ -110,15 +112,138 @@ learning_rate = 0.001
 #should be a power of 2
 batch_size = 64
 
-#Number of classes - 41 in real dataset
-n_classes = 2
-n_channels = 29
+#Number of classes - 45 in real dataset
+n_classes = 45
+n_channels = 3
 #two placeholders, x and y
 #First value is left as 'None' as it'll be defined later on as 'batch_size'
-x = tf.placeholder('float', [None, 480, 480, n_channels])
+x = tf.placeholder('float', [None, 385, 413, n_channels])
 y = tf.placeholder('float', [None, n_classes])
 
 
+#create labels
+#for i in range(46):
+Phonemes = {}
+full_script = []
+with open('labels/min_1.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_2.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_3.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_4.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_5.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_6.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_7.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_8.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_9.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_10.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_11.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_12.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_13.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_14.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_15.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_16.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_17.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_18.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_19.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_20.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_21.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_22.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_23.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_24.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_25.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+with open('labels/min_26.csv', 'r') as f:
+	reader = csv.reader(f)
+	list_min = list(reader)
+	full_script += list_min
+number = 0
+for i in full_script:
+	if number >=1000:
+		break
+
+	if (i)[0] not in Phonemes:
+		Phonemes[(i)[0]] = number
+		#print (Phonemes)
+		number += 1
+
+print (len(full_script))
+print (Phonemes)
+
+exit()
+#
 def conv2d(x, W, b, stride = 1):
 	#A conv2d rapper that performs convolution, adds bias, and does relu
 	# x - input, W - weights, b - bias
@@ -145,31 +270,31 @@ weights = {
 	#'shape' parameters - filter size, input dimension, output dimension
 
 	#Convolution
-	'wc1': tf.get_variable('W0', shape = (3,3,n_channels,58), initializer= tf.contrib.layers.xavier_initializer()),
-	'wc2': tf.get_variable('W1', shape = (3,3,58,116), initializer= tf.contrib.layers.xavier_initializer()),
-	'wc3': tf.get_variable('W2', shape = (3,3,116,232), initializer= tf.contrib.layers.xavier_initializer()),
-	'wc4': tf.get_variable('W3', shape = (3,3,232,464), initializer= tf.contrib.layers.xavier_initializer()),
-	'wc5': tf.get_variable('W4', shape = (3,3,464,464), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc1': tf.get_variable('W0', shape = (3,3,3,27), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc2': tf.get_variable('W1', shape = (3,3,27,54), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc3': tf.get_variable('W2', shape = (3,3,54,108), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc4': tf.get_variable('W3', shape = (3,3,108,216), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc5': tf.get_variable('W4', shape = (3,3,216,216), initializer= tf.contrib.layers.xavier_initializer()),
 
 	#For fully conncected
 	#Shape first parameter equals result of previous output
 	#4 by 4 image with 128 channels
-	'wd1': tf.get_variable('W5', shape = (15*15*464, 116), initializer= tf.contrib.layers.xavier_initializer()),
+	'wd1': tf.get_variable('W5', shape = (13*13*216, 216), initializer= tf.contrib.layers.xavier_initializer()),
 	# For output
-	'out': tf.get_variable('W6', shape = (116, n_classes), initializer= tf.contrib.layers.xavier_initializer())
+	'out': tf.get_variable('W6', shape = (216, n_classes), initializer= tf.contrib.layers.xavier_initializer())
 }
 
 biases = {
 	#All the biases for the NN model
 	#Just like the weights, these values must be intialized
 
-	'bc1':tf.get_variable('B0', shape = 58, initializer=tf.contrib.layers.xavier_initializer()),
-	'bc2':tf.get_variable('B1', shape = 116, initializer=tf.contrib.layers.xavier_initializer()),
-	'bc3':tf.get_variable('B2', shape = 232, initializer=tf.contrib.layers.xavier_initializer()),
-	'bc4':tf.get_variable('B3', shape = 464, initializer=tf.contrib.layers.xavier_initializer()),
-	'bc5':tf.get_variable('B4', shape = 464, initializer=tf.contrib.layers.xavier_initializer()),
+	'bc1':tf.get_variable('B0', shape = 27, initializer=tf.contrib.layers.xavier_initializer()),
+	'bc2':tf.get_variable('B1', shape = 54, initializer=tf.contrib.layers.xavier_initializer()),
+	'bc3':tf.get_variable('B2', shape = 108, initializer=tf.contrib.layers.xavier_initializer()),
+	'bc4':tf.get_variable('B3', shape = 216, initializer=tf.contrib.layers.xavier_initializer()),
+	'bc5':tf.get_variable('B4', shape = 216, initializer=tf.contrib.layers.xavier_initializer()),
 
-	'bd1':tf.get_variable('B5', shape = 116, initializer=tf.contrib.layers.xavier_initializer()),
+	'bd1':tf.get_variable('B5', shape = 216, initializer=tf.contrib.layers.xavier_initializer()),
 	'out':tf.get_variable('B6', shape = n_classes, initializer=tf.contrib.layers.xavier_initializer())
 }
 
@@ -191,14 +316,14 @@ def conv_net(x, weights, biases):
 	conv3 = conv2d(conv2, weights['wc3'], biases['bc3'])
 	conv3 = maxpool2d(conv3)
 	#Convloution layer 4
-	conv4 = conv2d(conv3, weights['wc4'], biases['b4'])
+	conv4 = conv2d(conv3, weights['wc4'], biases['bc4'])
 	conv4 = maxpool2d(conv4)
 	#Convloution layer 5
 	conv5 = conv2d(conv4, weights['wc5'], biases['bc5'])
 	conv5 = maxpool2d(conv5)
-
 	#Fully connected layer
 	# Reshapes last layer accordingly
+
 	conv5_flattened = tf.reshape(conv5,[-1, weights['wd1'].get_shape()[0]])
 	#Multiplies fc1 and 'wd1' and then adds it with bias
 	fc1 = tf.add(tf.matmul(conv5_flattened, weights['wd1']),biases['bd1'])
@@ -238,7 +363,7 @@ train_accuracy = []
 test_loss = []
 summary_writer = tf.summary.FileWriter('./Output',sess.graph)
 for i in range(training_iter):
-	for batch in range(1194//batch_size):
+	for batch in range(6400//batch_size):
 		fake_batch_x = []
 		fake_batch_y = []
 		#batch_x = train_X[batch*batch_size:min((batch+1)*batch_size,len(train_X))]
@@ -249,31 +374,33 @@ for i in range(training_iter):
 		
 		#Runs backpropagation
 		#Feeds placeholder x and y
-		for training_ex in range(batch_size):
-			z = random.randint(20,1170)
-			frames = []
-			for frame_index in range((z-14),(z+15)):
-				frame = read_img('foo'+str(frame_index)+'.png')
-				file = np.reshape(frame,[-1,480,480,1])
-				frames.append(file)
-			real_training_ex = np.concatenate((frames[0], frames[1], frames[2], frames[3], frames[4], frames[5], frames[6], frames[7], frames[8], frames[9], frames[10], frames[11], frames[12],frames[13], frames[14], frames[15], frames[16], frames[17], frames[18], frames[19], frames[20], frames[21], frames[22], frames[23], frames[24], frames[25], frames[26], frames[27], frames[28]),3)       
 
-			fake_batch_x.append(real_training_ex)
-			if z <= 599:
-				fake_batch_y.append(0)
-			else:
-				fake_batch_y.append(1)
+		#puts images into fake_batch_x list
+		for training_ex in range(batch_size):
+			z = random.randint(0,154122)
+			while (z/60) < 1 or (z/60) > 59:
+				z = random.randint(0,157000)
+			img = framenumToimg(z)
+			fake_batch_x.append(img)
+			fake_batch_x[training_ex] = np.reshape(fake_batch_x[training_ex], (1,385,413,3))
+			fake_batch_y.append(full_script[z])
+		print ('created fake_batch_x with a length of ' + str(len(fake_batch_x))+ ' and created fake_batch_y with a length of ' + str(len(fake_batch_y)) + ' for batch ' + str(batch))
+
+		#batch_x is defined as a numpy array of fake_batch_x		
 		for fake_i in range(batch_size):
 			if fake_i == 0:
-				batch_x = fake_batch_x[0]
+				batch_x = np.array(fake_batch_x[0])
 			else:
-				batch_x = np.concatenate((batch_x, fake_batch_x[fake_i]))
+				batch_x = np.concatenate((batch_x, fake_batch_x[fake_i]),0)
+		print ('created batch x with a shape of ' + str(batch_x.shape))
 		assistant_y = np.zeros((batch_size,2))
 		fake_batch_y = np.array(fake_batch_y)
 		batch_y = assistant_y[np.arange(batch_size),fake_batch_y] = 1
 		batch_y = assistant_y
+		print ('running batch x for batch num: ' +str(batch))
 		opt = sess.run(optimizer, feed_dict = {x:batch_x, y:batch_y})
 		prediction = sess.run(pred, feed_dict = {x:batch_x})
+		print ('saving weights')
 		#Runs Evaluation
 		if batch %2 ==0:
 			print (batch)
@@ -291,6 +418,8 @@ for i in range(training_iter):
 			np.save('bias_5.npy', sess.run(biases['bc5']))
 			np.save('bias_wd1.npy', sess.run(biases['bd1']))
 			np.save('bias_out.npy', sess.run(biases['out']))
+		print ('finished batch number ' + str(batch))
+		print ('\n')
 	#Loss and accuracy for train set
 	#FIX THIS!
 	#FIX THIS!
