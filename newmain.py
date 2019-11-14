@@ -16,6 +16,8 @@ from reads_csv import read_file
 import csv
 from frametoimg import framenumToimg
 import pandas as pd
+import sys
+np.set_printoptions(threshold=sys.maxsize)
 
 IMG_DIR = 'full_vid'
 #full_list = []
@@ -106,14 +108,14 @@ print (z.shape)'''
 
 #print (train_y.shape, test_y.shape)
 
-training_iter = 200
+training_iter = 1000
 #Start off at 0.001, then 0.003, then 0.01 etc...
 learning_rate = 0.001 
 #should be a power of 2
 batch_size = 64
 
-#Number of classes - 45 in real dataset
-n_classes = 45
+#Number of classes - 41 in real dataset
+n_classes = 41
 n_channels = 3
 #two placeholders, x and y
 #First value is left as 'None' as it'll be defined later on as 'batch_size'
@@ -229,20 +231,26 @@ with open('labels/min_26.csv', 'r') as f:
 	reader = csv.reader(f)
 	list_min = list(reader)
 	full_script += list_min
+
 number = 0
 for i in full_script:
 	if number >=1000:
 		break
 
-	if (i)[0] not in Phonemes:
-		Phonemes[(i)[0]] = number
+	if i[0][-2] == '_':
+		if (i)[0][:-2] not in Phonemes:
+			Phonemes[(i)[0][:-2]] = number
+			number += 1
+	else:
+		if (i)[0] not in Phonemes:
+			Phonemes[(i)[0]] = number
+			number +=1
+
+
+
 		#print (Phonemes)
-		number += 1
 
-print (len(full_script))
-print (Phonemes)
 
-exit()
 #
 def conv2d(x, W, b, stride = 1):
 	#A conv2d rapper that performs convolution, adds bias, and does relu
@@ -363,7 +371,7 @@ train_accuracy = []
 test_loss = []
 summary_writer = tf.summary.FileWriter('./Output',sess.graph)
 for i in range(training_iter):
-	for batch in range(6400//batch_size):
+	for batch in range(1280//batch_size):
 		fake_batch_x = []
 		fake_batch_y = []
 		#batch_x = train_X[batch*batch_size:min((batch+1)*batch_size,len(train_X))]
@@ -377,13 +385,18 @@ for i in range(training_iter):
 
 		#puts images into fake_batch_x list
 		for training_ex in range(batch_size):
-			z = random.randint(0,154122)
-			while (z/60) < 1 or (z/60) > 59:
-				z = random.randint(0,157000)
+			z = random.randint(1,156000)
+			while (z/60) < 1 or (z/60) > 59 or full_script[z][0] == 'oov' or full_script[z][0] == 'not-found-in-audio':
+				z = random.randint(0,156000)
 			img = framenumToimg(z)
 			fake_batch_x.append(img)
 			fake_batch_x[training_ex] = np.reshape(fake_batch_x[training_ex], (1,385,413,3))
-			fake_batch_y.append(full_script[z])
+			if full_script[z][0][-2] == '_':
+				fake_batch_y.append(Phonemes[full_script[z][0][:-2]])
+			else:
+				fake_batch_y.append(Phonemes[full_script[z][0]])
+			#print ('using frame ' + str(z) + ' and the label is ' + str(fake_batch_y[-1]))
+
 		print ('created fake_batch_x with a length of ' + str(len(fake_batch_x))+ ' and created fake_batch_y with a length of ' + str(len(fake_batch_y)) + ' for batch ' + str(batch))
 
 		#batch_x is defined as a numpy array of fake_batch_x		
@@ -393,16 +406,19 @@ for i in range(training_iter):
 			else:
 				batch_x = np.concatenate((batch_x, fake_batch_x[fake_i]),0)
 		print ('created batch x with a shape of ' + str(batch_x.shape))
-		assistant_y = np.zeros((batch_size,2))
+		assistant_y = np.zeros((batch_size,41))
 		fake_batch_y = np.array(fake_batch_y)
+		#print (np.arange(batch_size))
+		#print (fake_batch_y)
 		batch_y = assistant_y[np.arange(batch_size),fake_batch_y] = 1
 		batch_y = assistant_y
+		#print (batch_y)
 		print ('running batch x for batch num: ' +str(batch))
 		opt = sess.run(optimizer, feed_dict = {x:batch_x, y:batch_y})
 		prediction = sess.run(pred, feed_dict = {x:batch_x})
 		print ('saving weights')
 		#Runs Evaluation
-		if batch %2 ==0:
+		if batch %9 ==0:
 			print (batch)
 			np.save('weight_1.npy', sess.run(weights['wc1']))
 			np.save('weight_2.npy', sess.run(weights['wc2']))
