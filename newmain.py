@@ -388,7 +388,10 @@ for i in range(training_iter):
 			z = random.randint(1,156000)
 			while (z/60) < 1 or (z/60) > 59 or full_script[z][0] == 'oov' or full_script[z][0] == 'not-found-in-audio':
 				z = random.randint(0,156000)
-			img = framenumToimg(z)
+			img = framenumToimg(z)/255
+			#print (img)
+
+
 			fake_batch_x.append(img)
 			fake_batch_x[training_ex] = np.reshape(fake_batch_x[training_ex], (1,385,413,3))
 			if full_script[z][0][-2] == '_':
@@ -416,10 +419,14 @@ for i in range(training_iter):
 		print ('running batch x for batch num: ' +str(batch))
 		opt = sess.run(optimizer, feed_dict = {x:batch_x, y:batch_y})
 		prediction = sess.run(pred, feed_dict = {x:batch_x})
-		print ('saving weights')
+		#print (prediction)
+		#print (batch_y)
+		#print (z)
+		#print (fake_batch_y)
 		#Runs Evaluation
 		if batch %9 ==0:
 			print (batch)
+			print ('saving weights')
 			np.save('weight_1.npy', sess.run(weights['wc1']))
 			np.save('weight_2.npy', sess.run(weights['wc2']))
 			np.save('weight_3.npy', sess.run(weights['wc3']))
@@ -436,12 +443,16 @@ for i in range(training_iter):
 			np.save('bias_out.npy', sess.run(biases['out']))
 		print ('finished batch number ' + str(batch))
 		print ('\n')
+		previous_batch_x = batch_x
+		previous_batch_y = batch_y
 	#Loss and accuracy for train set
 	#FIX THIS!
 	#FIX THIS!
 	#FIX THIS!
 	#More than just batch
-	loss, acc = sess.run([cost, accuracy], feed_dict={x:batch_x, y:batch_y})
+	test_batch_x = batch_x = np.concatenate((batch_x, previous_batch_x),0)
+	test_batch_y = batch_x = np.concatenate((batch_y, previous_batch_y),0)	
+	loss, acc = sess.run([cost, accuracy], feed_dict={x:test_batch_x, y:test_batch_y})
 	#Loss and accuracy for test set
 	#test_loss, valid_acc = sess.run([cost,accuracy], feed_dict={x:test_X,y:test_y})
 	print ('Iter ' + str(i))
