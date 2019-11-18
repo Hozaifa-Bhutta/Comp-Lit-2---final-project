@@ -369,6 +369,7 @@ test_loss = []
 train_accuracy = []
 test_loss = []
 thirty_second_window = 3000
+test_batches_acc = []
 for i in range(training_iter):
 	for batch in range(1280//batch_size):
 		fake_batch_x = []
@@ -459,6 +460,13 @@ for i in range(training_iter):
 	print ('Training Loss: ' + str(loss))
 	print ('Training Accuracy: ' + str(acc))
 	if acc >= 0.9:
+		test_batches_acc.append([test_batch_x,test_batch_y])
 		thirty_second_window += 3000
+	if thirty_second_window >3000:
+		for i in test_batches:
+			loss, acc = sess.run([cost, accuracy], feed_dict={x:test_batches_acc[0], y:test_batches_acc[1]})
+			print (acc)
+			print (loss)
+			print (i)
 	#print ('Test Loss: ' + str(test_loss))
 	#print ('Test Accuracy: ' +str(valid_acc))
