@@ -368,7 +368,7 @@ train_loss = []
 test_loss = []
 train_accuracy = []
 test_loss = []
-summary_writer = tf.summary.FileWriter('./Output',sess.graph)
+thirty_second_window = 3000
 for i in range(training_iter):
 	for batch in range(1280//batch_size):
 		fake_batch_x = []
@@ -384,9 +384,9 @@ for i in range(training_iter):
 
 		#puts images into fake_batch_x list
 		for training_ex in range(batch_size):
-			z = random.randint(1,156000)
+			z = random.randint(thirty_second_window - 3000,thirty_second_window)
 			while z%6000<100 or z%6000>5900 or full_script[z][0] =='not-found-in-audio' or full_script[z][0] =='oov':
-				z = random.randint(0,156000)
+				z = random.randint(thirty_second_window-3000,thirty_second_window)
 			img = framenumToimg(z)/255
 			#print (img)
 
@@ -458,5 +458,7 @@ for i in range(training_iter):
 	print ('Optimazion finished') 
 	print ('Training Loss: ' + str(loss))
 	print ('Training Accuracy: ' + str(acc))
+	if acc >= 0.9:
+		thirty_second_window += 3000
 	#print ('Test Loss: ' + str(test_loss))
 	#print ('Test Accuracy: ' +str(valid_acc))
