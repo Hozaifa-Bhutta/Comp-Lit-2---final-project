@@ -7,7 +7,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
 #The input_data is not required in the final phase since we will be making our own data set
-from tensorflow.examples.tutorials.mnist import input_data
 # Only works for IPython --->      %matplotlib inline
 #To run 'magic'
 import os
