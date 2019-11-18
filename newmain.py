@@ -315,7 +315,6 @@ def conv_net(x, weights, biases):
 
 	# Performs max_pooling. Calls maxpooling function defined above
 	conv1 = maxpool2d(conv1)
-	print (conv1.shape)
 	#Covloution layer 2 
 	conv2 = conv2d(conv1, weights['wc2'], biases['bc2'])
 	conv2 = maxpool2d(conv2)
@@ -340,7 +339,7 @@ def conv_net(x, weights, biases):
 
 	#Output layer
 	out = tf.add(tf.matmul(fc1,weights['out']), biases['out'])
-	print (out.shape)
+	out = tf.nn.softmax(tf.add(tf.matmul(fc1,weights['out']), biases['out']))
 	return out
 
 # Predictions are  stored here
@@ -386,7 +385,7 @@ for i in range(training_iter):
 		#puts images into fake_batch_x list
 		for training_ex in range(batch_size):
 			z = random.randint(1,156000)
-			while (z/60) < 1 or (z/60) > 59 or full_script[z][0] == 'oov' or full_script[z][0] == 'not-found-in-audio':
+			while z%6000<100 or z%6000>5900 or full_script[z][0] =='not-found-in-audio' or full_script[z][0] =='oov':
 				z = random.randint(0,156000)
 			img = framenumToimg(z)/255
 			#print (img)
@@ -394,10 +393,10 @@ for i in range(training_iter):
 
 			fake_batch_x.append(img)
 			fake_batch_x[training_ex] = np.reshape(fake_batch_x[training_ex], (1,385,413,3))
-			if full_script[z][0][-2] == '_':
-				fake_batch_y.append(Phonemes[full_script[z][0][:-2]])
+			if full_script[z-1][0][-2] == '_':
+				fake_batch_y.append(Phonemes[full_script[z-1][0][:-2]])
 			else:
-				fake_batch_y.append(Phonemes[full_script[z][0]])
+				fake_batch_y.append(Phonemes[full_script[z-1][0]])
 			#print ('using frame ' + str(z) + ' and the label is ' + str(fake_batch_y[-1]))
 
 		print ('created fake_batch_x with a length of ' + str(len(fake_batch_x))+ ' and created fake_batch_y with a length of ' + str(len(fake_batch_y)) + ' for batch ' + str(batch))
@@ -427,20 +426,20 @@ for i in range(training_iter):
 		if batch %9 ==0:
 			print (batch)
 			print ('saving weights')
-			np.save('weight_1.npy', sess.run(weights['wc1']))
-			np.save('weight_2.npy', sess.run(weights['wc2']))
-			np.save('weight_3.npy', sess.run(weights['wc3']))
-			np.save('weight_4.npy', sess.run(weights['wc4']))
-			np.save('weight_5.npy', sess.run(weights['wc5']))
-			np.save('weight_wd1.npy', sess.run(weights['wd1']))
-			np.save('weight_out.npy', sess.run(weights['out']))
-			np.save('bias_1.npy', sess.run(biases['bc1']))
-			np.save('bias_2.npy', sess.run(biases['bc2']))
-			np.save('bias_3.npy', sess.run(biases['bc3']))
-			np.save('bias_4.npy', sess.run(biases['bc4']))
-			np.save('bias_5.npy', sess.run(biases['bc5']))
-			np.save('bias_wd1.npy', sess.run(biases['bd1']))
-			np.save('bias_out.npy', sess.run(biases['out']))
+			np.save('weights_biases/weight_1.npy', sess.run(weights['wc1']))
+			np.save('weights_biases/weight_2.npy', sess.run(weights['wc2']))
+			np.save('weights_biases/weight_3.npy', sess.run(weights['wc3']))
+			np.save('weights_biases/weight_4.npy', sess.run(weights['wc4']))
+			np.save('weights_biases/weight_5.npy', sess.run(weights['wc5']))
+			np.save('weights_biases/weight_wd1.npy', sess.run(weights['wd1']))
+			np.save('weights_biases/weight_out.npy', sess.run(weights['out']))
+			np.save('weights_biases/bias_1.npy', sess.run(biases['bc1']))
+			np.save('weights_biases/bias_2.npy', sess.run(biases['bc2']))
+			np.save('weights_biases/bias_3.npy', sess.run(biases['bc3']))
+			np.save('weights_biases/bias_4.npy', sess.run(biases['bc4']))
+			np.save('weights_biases/bias_5.npy', sess.run(biases['bc5']))
+			np.save('weights_biases/bias_wd1.npy', sess.run(biases['bd1']))
+			np.save('weights_biases/bias_out.npy', sess.run(biases['out']))
 		print ('finished batch number ' + str(batch))
 		print ('\n')
 		previous_batch_x = batch_x
