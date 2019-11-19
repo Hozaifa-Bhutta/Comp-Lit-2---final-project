@@ -268,9 +268,7 @@ for i in range(training_iter):
 
 		# Optimization is run
 		print ('running batch x for batch num: ' +str(batch))
-		prev_weights = weights['wc1']
 		opt = sess.run(optimizer, feed_dict = {x:batch_x, y:batch_y})
-		print (weights['wc1'] == prev_weights)
 		#prediction = sess.run(pred, feed_dict = {x:batch_x})
 		if batch %9 ==0:
 			#Saves weights every 9 batches
