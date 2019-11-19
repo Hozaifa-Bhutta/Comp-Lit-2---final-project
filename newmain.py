@@ -18,94 +18,7 @@ import pandas as pd
 import sys
 np.set_printoptions(threshold=sys.maxsize)
 
-IMG_DIR = 'full_vid'
-#full_list = []
-'''for img in os.listdir(IMG_DIR):
-		img_array = cv2.imread(os.path.join(IMG_DIR,img), cv2.IMREAD_GRAYSCALE)
 
-		img_array = (img_array.flatten())
-
-		img_array  = img_array.reshape(-1, 1).T
-		img_array = list(img_array[0])
-		#for i in range(0,len(img_array)):
-		#	img_array[i] = float(img_array[i])*(1/255)
-		full_list.append((img_array))
-print (full_list[0])'''
-def read_img(img):
-	im = cv2.imread("/Users/Hozai/Desktop/audios/raw_pictures/"+img,1)
-	print (type(im)) #Print <class 'numpy.ndarray'>
-	print (im.size) #prints 2100000
-	return im
-#Maximum is 255
-#Minimum is 0
-#os.environ["CUDA_VISIBLE_DEVICES"]="0" #for training on gpu
-#Imports data from tensorflow library 'input_data'. one_hot transforms categorical labels into binary vectors
-'''one_hot - In one-hot encoding, you convert the categorical data into a vector of numbers. You do this because machine learning algorithms can't work with categorical data directly. 
-Instead, you generate one boolean column for each category or class. Only one of these columns could take on the value 1 for each sample. That explains the term "one-hot encoding".'''
-#data = input_data.read_data_sets('data/fashion', one_hot = True)
-
-
-#All images are scaled between 0-1 in this dataset. In artifical dataset we need to scale it down to this value
-
-# Shapes of training set
-#print("Training set (images) shape: {shape}".format(shape=data.train.images.shape))
-#print("Training set (labels) shape: {shape}".format(shape=data.train.labels.shape))
-
-#New line
-#print ('\n')
-
-# Shapes of test set
-#print("Test set (images) shape: {shape}".format(shape=data.test.images.shape))
-#print("Test set (labels) shape: {shape}".format(shape=data.test.labels.shape))
-
-# Create dictionary of target classes
-# This will be changed later on into 41 different Phonemes plus 'silence'
-label_dict = {
- 0: 'T-shirt/top',
- 1: 'Trouser',
- 2: 'Pullover',
- 3: 'Dress',
- 4: 'Coat',
- 5: 'Sandal',
- 6: 'Shirt',
- 7: 'Sneaker',
- 8: 'Bag',
- 9: 'Ankle boot',
-}
-
-
-
-# Gives vector version of image '0'
-#  print(data.train.images[0]) <--- returns a long vector
-
-# Prints largest value, should be 1
-#print(np.max(data.train.images[0]))
-
-#Prints smallest value, should be 0
-#print(np.min(data.train.images[0]))
-
-#Reshapes each image into a vector
-# The '-1' means that it infers the batch size
-#train_X = data.train.images.reshape(-1,28,28,1)
-#test_X = data.test.images.reshape(-1,28,28,1)
-
-
-'''
-image_0 = train_X[0]
-image_1=train_X[1]
-image_2=train_X[2]
-z=tf.concat([image_0,image_1,image_2],2)
-print (z.shape)'''
-
-
-# Should return 'batch size' (inferred) by 28 by 28 by 1
-#print (train_X.shape, test_X.shape)
-
-# Extracts 'test' dataset
-#train_y = data.train.labels
-#test_y = data.test.labels
-
-#print (train_y.shape, test_y.shape)
 
 training_iter = 1000
 #Start off at 0.001, then 0.003, then 0.01 etc...
@@ -113,7 +26,7 @@ learning_rate = 0.001
 #should be a power of 2
 batch_size = 64
 
-#Number of classes - 41 in real dataset
+#Number of classes - 41 
 n_classes = 41
 n_channels = 3
 #two placeholders, x and y
@@ -123,113 +36,15 @@ y = tf.placeholder('float', [None, n_classes])
 
 
 #create labels
-#for i in range(46):
 Phonemes = {}
 full_script = []
-with open('labels/min_1.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_2.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_3.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_4.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_5.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_6.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_7.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_8.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_9.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_10.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_11.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_12.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_13.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_14.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_15.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_16.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_17.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_18.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_19.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_20.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_21.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_22.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_23.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_24.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_25.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_26.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
+
+for i in range(1,27):
+	with open('labels/min_’ + str(i) + ‘.csv', 'r') as f:
+		reader = csv.reader(f)
+		list_min = list(reader)
+		full_script += list_min
+
 
 number = 0
 for i in full_script:
@@ -363,21 +178,54 @@ init = tf.global_variables_initializer()
 sess = tf.Session()
 #Start computational graph
 sess.run(init)
-train_loss = []
-test_loss = []
-train_accuracy = []
-test_loss = []
+
+
+
+
+#Creates base_batch_x and base_batch_y
+base_fake_batch_x = []
+base_fake_batch_y = []
+for training_ex in range(256):
+
+	z = random.randint(1,156000)
+	while z%6000<100 or z%6000>5900 or full_script[z][0] =='not-found-in-audio' or full_script[z][0] =='oov':
+		z = random.randint(1,156000)
+	img = framenumToimg(z)/255
+	#print (img)
+
+
+	base_fake_batch_x.append(img)
+	base_fake_batch_x[training_ex] = np.reshape(base_fake_batch_x[training_ex], (1,385,413,3))
+	if full_script[z-1][0][-2] == '_':
+		base_fake_batch_y.append(Phonemes[full_script[z-1][0][:-2]])
+	else:
+		base_fake_batch_y.append(Phonemes[full_script[z-1][0]])
+
+print ('created base_fake_batch_x with a length of ' + str(len(base_fake_batch_x))+ ' and created base_fake_batch_y with a length of ' + str(len(base_fake_batch_y)))
+
+for fake_i in range(256):
+	if fake_i == 0:
+		base_batch_x = np.array(base_fake_batch_x[0])
+	else:
+		base_batch_x = np.concatenate((base_batch_x, base_fake_batch_x[fake_i]),0)
+print ('created base_batch x with a shape of ' + str(base_batch_x.shape))
+assistant_y = np.zeros((256,41))
+base_fake_batch_y = np.array(base_fake_batch_y)
+
+base_batch_y = assistant_y[np.arange(256),base_fake_batch_y] = 1
+base_batch_y = assistant_y
+
+
+
+
 thirty_second_window = 3000
-test_batches_acc = []
+
+
 for i in range(training_iter):
 	for batch in range(1280//batch_size):
 		fake_batch_x = []
 		fake_batch_y = []
-		#batch_x = train_X[batch*batch_size:min((batch+1)*batch_size,len(train_X))]
-		
-		'''a = np.array([0,1])
-		b = np.zeros((2, 2))
-		b[np.arange(2), a] = 1'''
+
 		
 		#Runs backpropagation
 		#Feeds placeholder x and y
@@ -401,7 +249,10 @@ for i in range(training_iter):
 
 		print ('created fake_batch_x with a length of ' + str(len(fake_batch_x))+ ' and created fake_batch_y with a length of ' + str(len(fake_batch_y)) + ' for batch ' + str(batch))
 
-		#batch_x is defined as a numpy array of fake_batch_x		
+
+
+
+		#batch_x is defined as a numpy array of fake_batch_x and batch_y is defined    
 		for fake_i in range(batch_size):
 			if fake_i == 0:
 				batch_x = np.array(fake_batch_x[0])
@@ -410,19 +261,15 @@ for i in range(training_iter):
 		print ('created batch x with a shape of ' + str(batch_x.shape))
 		assistant_y = np.zeros((batch_size,41))
 		fake_batch_y = np.array(fake_batch_y)
-		#print (np.arange(batch_size))
-		#print (fake_batch_y)
 		batch_y = assistant_y[np.arange(batch_size),fake_batch_y] = 1
 		batch_y = assistant_y
-		#print (batch_y)
+
+
+
+		# Optimization is run
 		print ('running batch x for batch num: ' +str(batch))
 		opt = sess.run(optimizer, feed_dict = {x:batch_x, y:batch_y})
-		prediction = sess.run(pred, feed_dict = {x:batch_x})
-		#print (prediction)
-		#print (batch_y)
-		#print (z)
-		#print (fake_batch_y)
-		#Runs Evaluation
+		#prediction = sess.run(pred, feed_dict = {x:batch_x})
 		if batch %9 ==0:
 			print (batch)
 			print ('saving weights')
@@ -444,28 +291,23 @@ for i in range(training_iter):
 		print ('\n')
 		previous_batch_x = batch_x
 		previous_batch_y = batch_y
-	#Loss and accuracy for train set
-	#FIX THIS!
-	#FIX THIS!
-	#FIX THIS!
-	#More than just batch
+
 	test_batch_x = batch_x = np.concatenate((batch_x, previous_batch_x),0)
-	test_batch_y = batch_x = np.concatenate((batch_y, previous_batch_y),0)	
+	test_batch_y = batch_x = np.concatenate((batch_y, previous_batch_y),0)  
 	loss, acc = sess.run([cost, accuracy], feed_dict={x:test_batch_x, y:test_batch_y})
-	#Loss and accuracy for test set
-	#test_loss, valid_acc = sess.run([cost,accuracy], feed_dict={x:test_X,y:test_y})
+	base_loss, base_acc = sess.run([cost, accuracy], feed_dict={x:base_batch_x, y:base_batch_y})
+
+	#Loss and accuracy 
 	print ('Iter ' + str(i))
 	print ('Optimazion finished') 
 	print ('Training Loss: ' + str(loss))
 	print ('Training Accuracy: ' + str(acc))
+	print ('Base Accuracy: ' + str(base_acc))
+	print ('Base Loss: ' + str(base_loss))
+	print ('window of time ' + str(thirty_second_window))
 	if acc >= 0.9:
-		test_batches_acc.append([test_batch_x,test_batch_y])
 		thirty_second_window += 3000
-	if thirty_second_window >3000:
-		for i in test_batches:
-			loss, acc = sess.run([cost, accuracy], feed_dict={x:test_batches_acc[0], y:test_batches_acc[1]})
-			print (acc)
-			print (loss)
-			print (i)
+
+
 	#print ('Test Loss: ' + str(test_loss))
 	#print ('Test Accuracy: ' +str(valid_acc))
