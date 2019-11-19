@@ -22,7 +22,7 @@ np.set_printoptions(threshold=sys.maxsize)
 
 training_iter = 1000
 #Start off at 0.001, then 0.003, then 0.01 etc...
-learning_rate = 0.001 
+learning_rate = 0.001
 #should be a power of 2
 batch_size = 64
 
@@ -40,7 +40,7 @@ Phonemes = {}
 full_script = []
 
 for i in range(1,27):
-	with open('labels/min_’ + str(i) + ‘.csv', 'r') as f:
+	with open('labels/min_' + str(i) + '.csv', 'r') as f:
 		reader = csv.reader(f)
 		list_min = list(reader)
 		full_script += list_min
@@ -268,9 +268,12 @@ for i in range(training_iter):
 
 		# Optimization is run
 		print ('running batch x for batch num: ' +str(batch))
+		prev_weights = weights['wc1']
 		opt = sess.run(optimizer, feed_dict = {x:batch_x, y:batch_y})
+		print (weights['wc1'] == prev_weights)
 		#prediction = sess.run(pred, feed_dict = {x:batch_x})
 		if batch %9 ==0:
+			#Saves weights every 9 batches
 			print (batch)
 			print ('saving weights')
 			np.save('weights_biases/weight_1.npy', sess.run(weights['wc1']))
@@ -289,12 +292,14 @@ for i in range(training_iter):
 			np.save('weights_biases/bias_out.npy', sess.run(biases['out']))
 		print ('finished batch number ' + str(batch))
 		print ('\n')
-		previous_batch_x = batch_x
-		previous_batch_y = batch_y
+	#SOMETHING WRONG HERE
+	#SOMETHING WRONG HERE
+	#SOMETHING WRONG HERE
+	#SOMETHING WRONG HERE
+	#SOMETHING WRONG HERE
 
-	test_batch_x = batch_x = np.concatenate((batch_x, previous_batch_x),0)
-	test_batch_y = batch_x = np.concatenate((batch_y, previous_batch_y),0)  
-	loss, acc = sess.run([cost, accuracy], feed_dict={x:test_batch_x, y:test_batch_y})
+
+	loss, acc = sess.run([cost, accuracy], feed_dict={x:batch_x, y:batch_y})
 	base_loss, base_acc = sess.run([cost, accuracy], feed_dict={x:base_batch_x, y:base_batch_y})
 
 	#Loss and accuracy 
