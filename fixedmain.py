@@ -276,32 +276,30 @@ weights = {
 	#'shape' parameters - filter size, input dimension, output dimension
 
 	#Convolution
-	'wc1': tf.get_variable('W0', shape = (3,3,3,27), initializer= tf.contrib.layers.xavier_initializer()),
-	'wc2': tf.get_variable('W1', shape = (3,3,27,54), initializer= tf.contrib.layers.xavier_initializer()),
-	'wc3': tf.get_variable('W2', shape = (3,3,54,108), initializer= tf.contrib.layers.xavier_initializer()),
-	'wc4': tf.get_variable('W3', shape = (3,3,108,216), initializer= tf.contrib.layers.xavier_initializer()),
-	'wc5': tf.get_variable('W4', shape = (3,3,216,216), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc1': tf.get_variable('W0', shape = (3,3,3,30), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc2': tf.get_variable('W1', shape = (3,3,30,60), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc3': tf.get_variable('W2', shape = (3,3,60,120), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc4': tf.get_variable('W3', shape = (3,3,240,240), initializer= tf.contrib.layers.xavier_initializer()),
 
 	#For fully conncected
 	#Shape first parameter equals result of previous output
 	#4 by 4 image with 128 channels
-	'wd1': tf.get_variable('W5', shape = (13*13*216, 216), initializer= tf.contrib.layers.xavier_initializer()),
+	'wd1': tf.get_variable('W4', shape = (26*26*240, 240), initializer= tf.contrib.layers.xavier_initializer()),
 	# For output
-	'out': tf.get_variable('W6', shape = (216, n_classes), initializer= tf.contrib.layers.xavier_initializer())
+	'out': tf.get_variable('W5', shape = (240, n_classes), initializer= tf.contrib.layers.xavier_initializer())
 }
 
 biases = {
 	#All the biases for the NN model
 	#Just like the weights, these values must be intialized
 
-	'bc1':tf.get_variable('B0', shape = 27, initializer=tf.zeros_initializer()),
-	'bc2':tf.get_variable('B1', shape = 54, initializer=tf.zeros_initializer()),
-	'bc3':tf.get_variable('B2', shape = 108, initializer=tf.zeros_initializer()),
-	'bc4':tf.get_variable('B3', shape = 216, initializer=tf.zeros_initializer()),
-	'bc5':tf.get_variable('B4', shape = 216, initializer=tf.zeros_initializer()),
+	'bc1':tf.get_variable('B0', shape = 30, initializer=tf.zeros_initializer()),
+	'bc2':tf.get_variable('B1', shape = 60, initializer=tf.zeros_initializer()),
+	'bc3':tf.get_variable('B2', shape = 120, initializer=tf.zeros_initializer()),
+	'bc4':tf.get_variable('B3', shape = 240, initializer=tf.zeros_initializer()),
 
-	'bd1':tf.get_variable('B5', shape = 216, initializer=tf.contrib.layers.xavier_initializer()),
-	'out':tf.get_variable('B6', shape = n_classes, initializer=tf.contrib.layers.xavier_initializer())
+	'bd1':tf.get_variable('B4', shape = 240, initializer=tf.zeros_initializer()),
+	'out':tf.get_variable('B5', shape = n_classes, initializer=tf.zeros_initializer())
 }
 
 
@@ -324,15 +322,13 @@ def conv_net(x, weights, biases):
 	#Convloution layer 4
 	conv4 = conv2d(conv3, weights['wc4'], biases['bc4'])
 	conv4 = maxpool2d(conv4)
-	#Convloution layer 5
-	conv5 = conv2d(conv4, weights['wc5'], biases['bc5'])
-	conv5 = maxpool2d(conv5)
+
 	#Fully connected layer
 	# Reshapes last layer accordingly
 
-	conv5_flattened = tf.reshape(conv5,[-1, weights['wd1'].get_shape()[0]])
+	conv4_flattened = tf.reshape(conv4,[-1, weights['wd1'].get_shape()[0]])
 	#Multiplies fc1 and 'wd1' and then adds it with bias
-	fc1 = tf.add(tf.matmul(conv5_flattened, weights['wd1']),biases['bd1'])
+	fc1 = tf.add(tf.matmul(conv4_flattened, weights['wd1']),biases['bd1'])
 	#Applies relu
 	fc1 = tf.nn.relu(fc1)
 
@@ -371,49 +367,50 @@ test_loss = []
 summary_writer = tf.summary.FileWriter('./Output',sess.graph)
 multiplier = 1
 for i in range(training_iter):
-	for batch in range(1280//batch_size):
-		fake_batch_x = []
-		fake_batch_y = []
-		#batch_x = train_X[batch*batch_size:min((batch+1)*batch_size,len(train_X))]
-		
-		'''a = np.array([0,1])
-		b = np.zeros((2, 2))
-		b[np.arange(2), a] = 1'''
-		
-		#Runs backpropagation
-		#Feeds placeholder x and y
+	for batch in range(0,6400//batch_size):
+		if batch%5 == 0:
+			fake_batch_x = []
+			fake_batch_y = []
+			#batch_x = train_X[batch*batch_size:min((batch+1)*batch_size,len(train_X))]
 
-		#puts images into fake_batch_x list
-		for training_ex in range(batch_size):
-			z = random.randint(1,156000)
-			while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or full_script[z][0] == 'oov' or full_script[z][0] == 'not-found-in-audio':
-				z = random.randint(0,156000)
-			img = framenumToimg(z)/255
-			
-			fake_batch_x.append(img)
-			fake_batch_x[training_ex] = np.reshape(fake_batch_x[training_ex], (1,385,413,3))
-			if full_script[z][0][-2] == '_':
-				fake_batch_y.append(Phonemes[full_script[z][0][:-2]])
-			else:
-				fake_batch_y.append(Phonemes[full_script[z][0]])
-			#print ('using frame ' + str(z) + ' and the label is ' + str(fake_batch_y[-1]))
+			'''a = np.array([0,1])
+			b = np.zeros((2, 2))
+			b[np.arange(2), a] = 1'''
 
-		print ('created fake_batch_x with a length of ' + str(len(fake_batch_x))+ ' and created fake_batch_y with a length of ' + str(len(fake_batch_y)) + ' for batch ' + str(batch))
+			#Runs backpropagation
+			#Feeds placeholder x and y
 
-		#batch_x is defined as a numpy array of fake_batch_x		
-		for fake_i in range(batch_size):
-			if fake_i == 0:
-				batch_x = np.array(fake_batch_x[0])
-			else:
-				batch_x = np.concatenate((batch_x, fake_batch_x[fake_i]),0)
-		print ('created batch x with a shape of ' + str(batch_x.shape))
-		assistant_y = np.zeros((batch_size,41))
-		fake_batch_y = np.array(fake_batch_y)
-		#print (np.arange(batch_size))
-		#print (fake_batch_y)
-		batch_y = assistant_y[np.arange(batch_size),fake_batch_y] = 1
-		batch_y = assistant_y
-		#print (batch_y)
+			#puts images into fake_batch_x list
+			for training_ex in range(batch_size):
+				z = random.randint(1,156000)
+				while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or full_script[z][0] == 'oov' or full_script[z][0] == 'not-found-in-audio':
+					z = random.randint(0,156000)
+				img = framenumToimg(z)/255
+
+				fake_batch_x.append(img)
+				fake_batch_x[training_ex] = np.reshape(fake_batch_x[training_ex], (1,385,413,3))
+				if full_script[z][0][-2] == '_':
+					fake_batch_y.append(Phonemes[full_script[z][0][:-2]])
+				else:
+					fake_batch_y.append(Phonemes[full_script[z][0]])
+				#print ('using frame ' + str(z) + ' and the label is ' + str(fake_batch_y[-1]))
+
+			print ('created fake_batch_x with a length of ' + str(len(fake_batch_x))+ ' and created fake_batch_y with a length of ' + str(len(fake_batch_y)) + ' for batch ' + str(batch))
+
+			#batch_x is defined as a numpy array of fake_batch_x		
+			for fake_i in range(batch_size):
+				if fake_i == 0:
+					batch_x = np.array(fake_batch_x[0])
+				else:
+					batch_x = np.concatenate((batch_x, fake_batch_x[fake_i]),0)
+			print ('created batch x with a shape of ' + str(batch_x.shape))
+			assistant_y = np.zeros((batch_size,41))
+			fake_batch_y = np.array(fake_batch_y)
+			#print (np.arange(batch_size))
+			#print (fake_batch_y)
+			batch_y = assistant_y[np.arange(batch_size),fake_batch_y] = 1
+			batch_y = assistant_y
+			#print (batch_y)
 		print ('running batch x for batch num: ' +str(batch))
 		opt = sess.run(optimizer, feed_dict = {x:batch_x, y:batch_y})
 		prediction = sess.run(pred, feed_dict = {x:batch_x})
