@@ -294,11 +294,11 @@ biases = {
 	#All the biases for the NN model
 	#Just like the weights, these values must be intialized
 
-	'bc1':tf.get_variable('B0', shape = 27, initializer=tf.contrib.layers.xavier_initializer()),
-	'bc2':tf.get_variable('B1', shape = 54, initializer=tf.contrib.layers.xavier_initializer()),
-	'bc3':tf.get_variable('B2', shape = 108, initializer=tf.contrib.layers.xavier_initializer()),
-	'bc4':tf.get_variable('B3', shape = 216, initializer=tf.contrib.layers.xavier_initializer()),
-	'bc5':tf.get_variable('B4', shape = 216, initializer=tf.contrib.layers.xavier_initializer()),
+	'bc1':tf.get_variable('B0', shape = 27, initializer=tf.zeros_initializer()),
+	'bc2':tf.get_variable('B1', shape = 54, initializer=tf.zeros_initializer()),
+	'bc3':tf.get_variable('B2', shape = 108, initializer=tf.zeros_initializer()),
+	'bc4':tf.get_variable('B3', shape = 216, initializer=tf.zeros_initializer()),
+	'bc5':tf.get_variable('B4', shape = 216, initializer=tf.zeros_initializer()),
 
 	'bd1':tf.get_variable('B5', shape = 216, initializer=tf.contrib.layers.xavier_initializer()),
 	'out':tf.get_variable('B6', shape = n_classes, initializer=tf.contrib.layers.xavier_initializer())
@@ -338,6 +338,7 @@ def conv_net(x, weights, biases):
 
 	#Output layer
 	out = tf.add(tf.matmul(fc1,weights['out']), biases['out'])
+	out = tf.nn.softmax(out)
 	print (out.shape)
 	return out
 
@@ -387,7 +388,7 @@ for i in range(training_iter):
 			z = random.randint(1,156000)
 			while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or full_script[z][0] == 'oov' or full_script[z][0] == 'not-found-in-audio':
 				z = random.randint(0,156000)
-			img = framenumToimg(z)
+			img = framenumToimg(z)/255
 			
 			fake_batch_x.append(img)
 			fake_batch_x[training_ex] = np.reshape(fake_batch_x[training_ex], (1,385,413,3))
