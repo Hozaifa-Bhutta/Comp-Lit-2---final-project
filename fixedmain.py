@@ -366,6 +366,77 @@ train_accuracy = []
 test_loss = []
 summary_writer = tf.summary.FileWriter('./Output',sess.graph)
 multiplier = 1
+
+
+#Test batch
+fake_batch_x = []
+fake_batch_y = []
+#batch_x = train_X[batch*batch_size:min((batch+1)*batch_size,len(train_X))]
+
+'''a = np.array([0,1])
+b = np.zeros((2, 2))
+b[np.arange(2), a] = 1'''
+
+#Runs backpropagation
+#Feeds placeholder x and y
+
+#puts images into fake_batch_x list
+for training_ex in range(248):
+	for insurance in range(1):
+		z = random.randint(1,156000)
+
+		#75% chance that the training example comes from the new batch introduced
+		if random.randint(1,4) >=2 and multiplier>1:
+			while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
+				z = random.randint(0,156000)
+			print ('first for loop')
+			print (z)
+		#Else it will pick one from before the new batch, therefore it can't forget old stuff
+		elif multiplier>1:
+			while not z > 100 or not z< ((3000*multiplier)-3000) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
+				z = random.randint(0,156000)
+			print ('second for loop')
+			print (z)
+		else:
+			while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
+				z = random.randint(0,156000)
+			print ('third for loop')
+			print (z)
+		img = np.load('all_spectograms/img_'+str(z)+'.npy')/255
+		if (img.shape != (385,165,3)):
+			continue 
+
+		fake_batch_x.append(img)
+		fake_batch_x[training_ex] = np.reshape(fake_batch_x[training_ex], (1,385,165,3))
+		if full_script[z-1][0][-2] == '_':
+			fake_batch_y.append(Phonemes[full_script[z-1][0][:-2]])
+		else:
+			fake_batch_y.append(Phonemes[full_script[z-1][0]])
+		#print ('using frame ' + str(z) + ' and the label is ' + str(fake_batch_y[-1]))
+
+print ('created fake_batch_x with a length of ' + str(len(fake_batch_x))+ ' and created fake_batch_y with a length of ' + str(len(fake_batch_y)) + ' for batch ' + str(batch))
+
+#batch_x is defined as a numpy array of fake_batch_x		
+for fake_i in range(batch_size):
+	if fake_i == 0:
+		batch_x = np.array(fake_batch_x[0])
+	else:
+		batch_x = np.concatenate((batch_x, fake_batch_x[fake_i]),0)
+print ('created batch x with a shape of ' + str(batch_x.shape))
+assistant_y = np.zeros((248,41))
+fake_batch_y = np.array(fake_batch_y)
+#print (np.arange(batch_size))
+#print (fake_batch_y)
+batch_y = assistant_y[np.arange(248),fake_batch_y] = 1
+batch_y = assistant_y
+
+base_batch_y = batch_y
+base_batch_x = batch_x
+#print (batch_y)
+
+
+
+
 for i in range(training_iter):
 	for batch in range(0,5120//batch_size):
 		if batch%4 == 0:
