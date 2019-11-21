@@ -382,36 +382,37 @@ for i in range(training_iter):
 
 			#puts images into fake_batch_x list
 			for training_ex in range(batch_size):
-				z = random.randint(1,156000)
-				
-				#75% chance that the training example comes from the new batch introduced
-				if random.randint(1,4) >=2 and multiplier>1:
-					while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
-						z = random.randint(0,156000)
-					print ('first for loop')
-					print (z)
-				#Else it will pick one from before the new batch, therefore it can't forget old stuff
-				elif multiplier>1:
-					while not z > 100 or not z< ((3000*multiplier)-3000) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
-						z = random.randint(0,156000)
-					print ('second for loop')
-					print (z)
-				else:
-					while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
-						z = random.randint(0,156000)
-					print ('third for loop')
-					print (z)
-				img = np.load('all_spectograms/img_'+str(z)+'.npy')/255
-				if (img.shape != (385,165,3)):
-					continue 
+				for insurance in range(1):
+					z = random.randint(1,156000)
 
-				fake_batch_x.append(img)
-				fake_batch_x[training_ex] = np.reshape(fake_batch_x[training_ex], (1,385,165,3))
-				if full_script[z-1][0][-2] == '_':
-					fake_batch_y.append(Phonemes[full_script[z-1][0][:-2]])
-				else:
-					fake_batch_y.append(Phonemes[full_script[z-1][0]])
-				#print ('using frame ' + str(z) + ' and the label is ' + str(fake_batch_y[-1]))
+					#75% chance that the training example comes from the new batch introduced
+					if random.randint(1,4) >=2 and multiplier>1:
+						while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
+							z = random.randint(0,156000)
+						print ('first for loop')
+						print (z)
+					#Else it will pick one from before the new batch, therefore it can't forget old stuff
+					elif multiplier>1:
+						while not z > 100 or not z< ((3000*multiplier)-3000) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
+							z = random.randint(0,156000)
+						print ('second for loop')
+						print (z)
+					else:
+						while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
+							z = random.randint(0,156000)
+						print ('third for loop')
+						print (z)
+					img = np.load('all_spectograms/img_'+str(z)+'.npy')/255
+					if (img.shape != (385,165,3)):
+						continue 
+
+					fake_batch_x.append(img)
+					fake_batch_x[training_ex] = np.reshape(fake_batch_x[training_ex], (1,385,165,3))
+					if full_script[z-1][0][-2] == '_':
+						fake_batch_y.append(Phonemes[full_script[z-1][0][:-2]])
+					else:
+						fake_batch_y.append(Phonemes[full_script[z-1][0]])
+					#print ('using frame ' + str(z) + ' and the label is ' + str(fake_batch_y[-1]))
 
 			print ('created fake_batch_x with a length of ' + str(len(fake_batch_x))+ ' and created fake_batch_y with a length of ' + str(len(fake_batch_y)) + ' for batch ' + str(batch))
 
