@@ -14,7 +14,6 @@ import os
 import random
 from reads_csv import read_file
 import csv
-from frametoimg import framenumToimg
 import pandas as pd
 import sys
 np.set_printoptions(threshold=sys.maxsize)
@@ -117,7 +116,7 @@ n_classes = 41
 n_channels = 3
 #two placeholders, x and y
 #First value is left as 'None' as it'll be defined later on as 'batch_size'
-x = tf.placeholder('float', [None, 385, 413, n_channels])
+x = tf.placeholder('float', [None, 385, 165, n_channels])
 y = tf.placeholder('float', [None, n_classes])
 
 
@@ -279,12 +278,12 @@ weights = {
 	'wc1': tf.get_variable('W0', shape = (3,3,3,30), initializer= tf.contrib.layers.xavier_initializer()),
 	'wc2': tf.get_variable('W1', shape = (3,3,30,60), initializer= tf.contrib.layers.xavier_initializer()),
 	'wc3': tf.get_variable('W2', shape = (3,3,60,120), initializer= tf.contrib.layers.xavier_initializer()),
-	'wc4': tf.get_variable('W3', shape = (3,3,240,240), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc4': tf.get_variable('W3', shape = (3,3,120,240), initializer= tf.contrib.layers.xavier_initializer()),
 
 	#For fully conncected
 	#Shape first parameter equals result of previous output
 	#4 by 4 image with 128 channels
-	'wd1': tf.get_variable('W4', shape = (26*26*240, 240), initializer= tf.contrib.layers.xavier_initializer()),
+	'wd1': tf.get_variable('W4', shape = (25*11*240, 240), initializer= tf.contrib.layers.xavier_initializer()),
 	# For output
 	'out': tf.get_variable('W5', shape = (240, n_classes), initializer= tf.contrib.layers.xavier_initializer())
 }
@@ -315,14 +314,16 @@ def conv_net(x, weights, biases):
 	#Covloution layer 2 
 	conv2 = conv2d(conv1, weights['wc2'], biases['bc2'])
 	conv2 = maxpool2d(conv2)
+	print (conv2.shape)
 
 	#Convloution layer 3
 	conv3 = conv2d(conv2, weights['wc3'], biases['bc3'])
 	conv3 = maxpool2d(conv3)
+	print (conv3.shape)
 	#Convloution layer 4
 	conv4 = conv2d(conv3, weights['wc4'], biases['bc4'])
 	conv4 = maxpool2d(conv4)
-
+	print (conv4.shape)
 	#Fully connected layer
 	# Reshapes last layer accordingly
 
@@ -334,7 +335,6 @@ def conv_net(x, weights, biases):
 
 	#Output layer
 	out = tf.add(tf.matmul(fc1,weights['out']), biases['out'])
-	out = tf.nn.softmax(out)
 	print (out.shape)
 	return out
 
@@ -367,8 +367,8 @@ test_loss = []
 summary_writer = tf.summary.FileWriter('./Output',sess.graph)
 multiplier = 1
 for i in range(training_iter):
-	for batch in range(0,6400//batch_size):
-		if batch%5 == 0:
+	for batch in range(0,5120//batch_size):
+		if batch%4 == 0:
 			fake_batch_x = []
 			fake_batch_y = []
 			#batch_x = train_X[batch*batch_size:min((batch+1)*batch_size,len(train_X))]
@@ -383,16 +383,34 @@ for i in range(training_iter):
 			#puts images into fake_batch_x list
 			for training_ex in range(batch_size):
 				z = random.randint(1,156000)
-				while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or full_script[z][0] == 'oov' or full_script[z][0] == 'not-found-in-audio':
-					z = random.randint(0,156000)
-				img = framenumToimg(z)/255
+				
+				#75% chance that the training example comes from the new batch introduced
+				if random.randint(1,4) >=2 and multiplier>1:
+					while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
+						z = random.randint(0,156000)
+					print ('first for loop')
+					print (z)
+				#Else it will pick one from before the new batch, therefore it can't forget old stuff
+				elif multiplier>1:
+					while not z > 100 or not z< ((3000*multiplier)-3000) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
+						z = random.randint(0,156000)
+					print ('second for loop')
+					print (z)
+				else:
+					while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
+						z = random.randint(0,156000)
+					print ('third for loop')
+					print (z)
+				img = np.load('all_spectograms/img_'+str(z)+'.npy')/255
+				if (img.shape != (385,165,3)):
+					continue 
 
 				fake_batch_x.append(img)
-				fake_batch_x[training_ex] = np.reshape(fake_batch_x[training_ex], (1,385,413,3))
-				if full_script[z][0][-2] == '_':
-					fake_batch_y.append(Phonemes[full_script[z][0][:-2]])
+				fake_batch_x[training_ex] = np.reshape(fake_batch_x[training_ex], (1,385,165,3))
+				if full_script[z-1][0][-2] == '_':
+					fake_batch_y.append(Phonemes[full_script[z-1][0][:-2]])
 				else:
-					fake_batch_y.append(Phonemes[full_script[z][0]])
+					fake_batch_y.append(Phonemes[full_script[z-1][0]])
 				#print ('using frame ' + str(z) + ' and the label is ' + str(fake_batch_y[-1]))
 
 			print ('created fake_batch_x with a length of ' + str(len(fake_batch_x))+ ' and created fake_batch_y with a length of ' + str(len(fake_batch_y)) + ' for batch ' + str(batch))
@@ -416,20 +434,18 @@ for i in range(training_iter):
 		prediction = sess.run(pred, feed_dict = {x:batch_x})
 		print ('saving weights')
 		#Runs Evaluation
-		if batch %9 ==0:
+		if (batch+1) %10 ==0:
 			print (batch)
 			np.save('weight_1.npy', sess.run(weights['wc1']))
 			np.save('weight_2.npy', sess.run(weights['wc2']))
 			np.save('weight_3.npy', sess.run(weights['wc3']))
 			np.save('weight_4.npy', sess.run(weights['wc4']))
-			np.save('weight_5.npy', sess.run(weights['wc5']))
 			np.save('weight_wd1.npy', sess.run(weights['wd1']))
 			np.save('weight_out.npy', sess.run(weights['out']))
 			np.save('bias_1.npy', sess.run(biases['bc1']))
 			np.save('bias_2.npy', sess.run(biases['bc2']))
 			np.save('bias_3.npy', sess.run(biases['bc3']))
 			np.save('bias_4.npy', sess.run(biases['bc4']))
-			np.save('bias_5.npy', sess.run(biases['bc5']))
 			np.save('bias_wd1.npy', sess.run(biases['bd1']))
 			np.save('bias_out.npy', sess.run(biases['out']))
 		print ('finished batch number ' + str(batch))
@@ -453,9 +469,9 @@ for i in range(training_iter):
 			acc_check += 1
 			if acc_check > 3:
 				multiplier +=1
-				acc_check = 0
+				acc_check = 1
 
 		except:
-			acc_check = 0
+			acc_check = 1
 	#print ('Test Loss: ' + str(test_loss))
 	#print ('Test Accuracy: ' +str(valid_acc))
