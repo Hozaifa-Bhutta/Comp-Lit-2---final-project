@@ -385,23 +385,11 @@ for training_ex in range(248):
 	for insurance in range(1):
 		z = random.randint(1,156000)
 
-		#75% chance that the training example comes from the new batch introduced
-		if random.randint(1,4) >=2 and multiplier>1:
-			while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
-				z = random.randint(0,156000)
-			print ('first for loop')
-			print (z)
+		while not z > (151000) or not z< (155000) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence' or z%6000 < 50 or z%6000 >5970 :
+			z = random.randint(0,156000)
+
 		#Else it will pick one from before the new batch, therefore it can't forget old stuff
-		elif multiplier>1:
-			while not z > 100 or not z< ((3000*multiplier)-3000) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
-				z = random.randint(0,156000)
-			print ('second for loop')
-			print (z)
-		else:
-			while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
-				z = random.randint(0,156000)
-			print ('third for loop')
-			print (z)
+
 		img = np.load('all_spectograms/img_'+str(z)+'.npy')/255
 		if (img.shape != (385,165,3)):
 			continue 
@@ -414,10 +402,10 @@ for training_ex in range(248):
 			fake_batch_y.append(Phonemes[full_script[z-1][0]])
 		#print ('using frame ' + str(z) + ' and the label is ' + str(fake_batch_y[-1]))
 
-print ('created fake_batch_x with a length of ' + str(len(fake_batch_x))+ ' and created fake_batch_y with a length of ' + str(len(fake_batch_y)) + ' for batch ' + str(batch))
+print ('created fake_batch_x with a length of ' + str(len(fake_batch_x))+ ' and created fake_batch_y with a length of ' + str(len(fake_batch_y)))
 
 #batch_x is defined as a numpy array of fake_batch_x		
-for fake_i in range(batch_size):
+for fake_i in range(248):
 	if fake_i == 0:
 		batch_x = np.array(fake_batch_x[0])
 	else:
@@ -430,16 +418,16 @@ fake_batch_y = np.array(fake_batch_y)
 batch_y = assistant_y[np.arange(248),fake_batch_y] = 1
 batch_y = assistant_y
 
-base_batch_y = batch_y
-base_batch_x = batch_x
+test_batch_y = batch_y
+test_batch_x = batch_x
 #print (batch_y)
 
 
-
-
+test_losses = []
+test_accs = []
 for i in range(training_iter):
-	for batch in range(0,5120//batch_size):
-		if batch%4 == 0:
+	for batch in range(0,1280//batch_size):
+		if batch%1 == 0:
 			fake_batch_x = []
 			fake_batch_y = []
 			#batch_x = train_X[batch*batch_size:min((batch+1)*batch_size,len(train_X))]
@@ -453,36 +441,40 @@ for i in range(training_iter):
 
 			#puts images into fake_batch_x list
 			for training_ex in range(batch_size):
-				for insurance in range(1):
-					z = random.randint(1,156000)
+				z = random.randint(1,156000)
 
-					#75% chance that the training example comes from the new batch introduced
-					if random.randint(1,4) >=2 and multiplier>1:
-						while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
-							z = random.randint(0,156000)
-						print ('first for loop')
-						print (z)
-					#Else it will pick one from before the new batch, therefore it can't forget old stuff
-					elif multiplier>1:
-						while not z > 100 or not z< ((3000*multiplier)-3000) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
-							z = random.randint(0,156000)
-						print ('second for loop')
-						print (z)
-					else:
-						while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
-							z = random.randint(0,156000)
-						print ('third for loop')
-						print (z)
-					img = np.load('all_spectograms/img_'+str(z)+'.npy')/255
-					if (img.shape != (385,165,3)):
-						continue 
+				#75% chance that the training example comes from the new batch introduced
+				if random.randint(1,4) >=2 and multiplier>1:
+					while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or z%6000 < 50 or z%6000 >5970 or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
+						z = random.randint(0,156000)
+					#print ('first for loop')
+					#print (z)
+				#Else it will pick one from before the new batch, therefore it can't forget old stuff
+				elif multiplier>1:
+					while not z > 100 or not z< ((3000*multiplier)-3000) or  z%6000 < 50 or z%6000 >5970 or  full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
+						z = random.randint(0,156000)
+					#print ('second for loop')
+					#print (z)
+				else:
+					while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
+						z = random.randint(0,156000)
+					#print ('third for loop')
+					#print (z)
+				img = np.load('all_spectograms/img_'+str(z)+'.npy')/255
 
-					fake_batch_x.append(img)
-					fake_batch_x[training_ex] = np.reshape(fake_batch_x[training_ex], (1,385,165,3))
-					if full_script[z-1][0][-2] == '_':
-						fake_batch_y.append(Phonemes[full_script[z-1][0][:-2]])
-					else:
-						fake_batch_y.append(Phonemes[full_script[z-1][0]])
+
+				fake_batch_x.append(img)
+				try:
+					fake_batch_x[-1] = np.reshape(fake_batch_x[-1], (1,385,165,3))
+				except Exception as e:
+					print (e)
+					print (training_ex)
+					print (len(fake_batch_x))
+					print (z)
+				if full_script[z-1][0][-2] == '_':
+					fake_batch_y.append(Phonemes[full_script[z-1][0][:-2]])
+				else:
+					fake_batch_y.append(Phonemes[full_script[z-1][0]])
 					#print ('using frame ' + str(z) + ' and the label is ' + str(fake_batch_y[-1]))
 
 			print ('created fake_batch_x with a length of ' + str(len(fake_batch_x))+ ' and created fake_batch_y with a length of ' + str(len(fake_batch_y)) + ' for batch ' + str(batch))
@@ -504,10 +496,9 @@ for i in range(training_iter):
 		print ('running batch x for batch num: ' +str(batch))
 		opt = sess.run(optimizer, feed_dict = {x:batch_x, y:batch_y})
 		prediction = sess.run(pred, feed_dict = {x:batch_x})
-		print ('saving weights')
 		#Runs Evaluation
 		if (batch+1) %10 ==0:
-			print (batch)
+			print ('saving weights')
 			np.save('weight_1.npy', sess.run(weights['wc1']))
 			np.save('weight_2.npy', sess.run(weights['wc2']))
 			np.save('weight_3.npy', sess.run(weights['wc3']))
@@ -528,15 +519,25 @@ for i in range(training_iter):
 	#FIX THIS!
 	#More than just batch
 	loss, acc = sess.run([cost, accuracy], feed_dict={x:batch_x, y:batch_y})
+	test_loss,test_acc = sess.run([cost, accuracy], feed_dict={x:test_batch_x, y:test_batch_y})
+	test_losses.append(test_loss)
+	test_accs.append(test_acc)
 	#Loss and accuracy for test set
 	#test_loss, valid_acc = sess.run([cost,accuracy], feed_dict={x:test_X,y:test_y})
+	print ('\n\n\n')
 	print ('Iter ' + str(i))
 	print ('Optimazion finished') 
 	print ('Training Loss: ' + str(loss))
 	print ('Training Accuracy: ' + str(acc))
 	print ('Multiplier: ' + str(multiplier))
+	print ('Testing Loss: ' + str(test_loss))
+	print ('Testing Accuracy: ' + str(test_acc))
+	if i%10 ==0:
+		print (test_losses)
+		print (test_accs)
 	print (z)
-	if acc >0.95:
+	print ('\n\n\n')
+	if acc >0.92:
 		try:
 			acc_check += 1
 			if acc_check > 3:
