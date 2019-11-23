@@ -15,93 +15,18 @@ import random
 from reads_csv import read_file
 import csv
 import pandas as pd
+from create_batch import CreateBatch
 import sys
 np.set_printoptions(threshold=sys.maxsize)
 
-IMG_DIR = 'full_vid'
-#full_list = []
-'''for img in os.listdir(IMG_DIR):
-		img_array = cv2.imread(os.path.join(IMG_DIR,img), cv2.IMREAD_GRAYSCALE)
-		img_array = (img_array.flatten())
-		img_array  = img_array.reshape(-1, 1).T
-		img_array = list(img_array[0])
-		#for i in range(0,len(img_array)):
-		#	img_array[i] = float(img_array[i])*(1/255)
-		full_list.append((img_array))
-print (full_list[0])'''
-def read_img(img):
-	im = cv2.imread("/Users/Hozai/Desktop/audios/raw_pictures/"+img,1)
-	print (type(im)) #Print <class 'numpy.ndarray'>
-	print (im.size) #prints 2100000
-	return im
 #Maximum is 255
 #Minimum is 0
-#os.environ["CUDA_VISIBLE_DEVICES"]="0" #for training on gpu
-#Imports data from tensorflow library 'input_data'. one_hot transforms categorical labels into binary vectors
-'''one_hot - In one-hot encoding, you convert the categorical data into a vector of numbers. You do this because machine learning algorithms can't work with categorical data directly. 
-Instead, you generate one boolean column for each category or class. Only one of these columns could take on the value 1 for each sample. That explains the term "one-hot encoding".'''
-#data = input_data.read_data_sets('data/fashion', one_hot = True)
-
-
-#All images are scaled between 0-1 in this dataset. In artifical dataset we need to scale it down to this value
-
-# Shapes of training set
-#print("Training set (images) shape: {shape}".format(shape=data.train.images.shape))
-#print("Training set (labels) shape: {shape}".format(shape=data.train.labels.shape))
-
-#New line
-#print ('\n')
-
-# Shapes of test set
-#print("Test set (images) shape: {shape}".format(shape=data.test.images.shape))
-#print("Test set (labels) shape: {shape}".format(shape=data.test.labels.shape))
-
-# Create dictionary of target classes
-# This will be changed later on into 41 different Phonemes plus 'silence'
-label_dict = {
- 0: 'T-shirt/top',
- 1: 'Trouser',
- 2: 'Pullover',
- 3: 'Dress',
- 4: 'Coat',
- 5: 'Sandal',
- 6: 'Shirt',
- 7: 'Sneaker',
- 8: 'Bag',
- 9: 'Ankle boot',
-}
 
 
 
-# Gives vector version of image '0'
-#  print(data.train.images[0]) <--- returns a long vector
-
-# Prints largest value, should be 1
-#print(np.max(data.train.images[0]))
-
-#Prints smallest value, should be 0
-#print(np.min(data.train.images[0]))
-
-#Reshapes each image into a vector
-# The '-1' means that it infers the batch size
-#train_X = data.train.images.reshape(-1,28,28,1)
-#test_X = data.test.images.reshape(-1,28,28,1)
 
 
-'''
-image_0 = train_X[0]
-image_1=train_X[1]
-image_2=train_X[2]
-z=tf.concat([image_0,image_1,image_2],2)
-print (z.shape)'''
 
-
-# Should return 'batch size' (inferred) by 28 by 28 by 1
-#print (train_X.shape, test_X.shape)
-
-# Extracts 'test' dataset
-#train_y = data.train.labels
-#test_y = data.test.labels
 
 #print (train_y.shape, test_y.shape)
 
@@ -112,7 +37,7 @@ learning_rate = 0.001
 batch_size = 64
 
 #Number of classes - 41 in real dataset
-n_classes = 41
+n_classes = 39
 n_channels = 3
 #two placeholders, x and y
 #First value is left as 'None' as it'll be defined later on as 'batch_size'
@@ -124,128 +49,27 @@ y = tf.placeholder('float', [None, n_classes])
 #for i in range(46):
 Phonemes = {}
 full_script = []
-with open('labels/min_1.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_2.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_3.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_4.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_5.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_6.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_7.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_8.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_9.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_10.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_11.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_12.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_13.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_14.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_15.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_16.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_17.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_18.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_19.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_20.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_21.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_22.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_23.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_24.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_25.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
-with open('labels/min_26.csv', 'r') as f:
-	reader = csv.reader(f)
-	list_min = list(reader)
-	full_script += list_min
+for i in range(1,27):
+	with open('labels/min_' + str(i) + '.csv', 'r') as f:
+		reader = csv.reader(f)
+		list_min = list(reader)
+		full_script += list_min
+
 
 number = 0
 for i in full_script:
-	if number >=1000:
+	if number ==39:
 		break
 
 	if i[0][-2] == '_':
 		if (i)[0][:-2] not in Phonemes:
 			Phonemes[(i)[0][:-2]] = number
 			number += 1
-	else:
-		if (i)[0] not in Phonemes:
-			Phonemes[(i)[0]] = number
-			number +=1
+	elif i[0] == 'silence' or i[0] == 'not-found-in-audio' or i[0] == 'oov':
+		pass
 
 
 
-		#print (Phonemes)
 
 
 #
@@ -275,30 +99,27 @@ weights = {
 	#'shape' parameters - filter size, input dimension, output dimension
 
 	#Convolution
-	'wc1': tf.get_variable('W0', shape = (3,3,3,30), initializer= tf.contrib.layers.xavier_initializer()),
-	'wc2': tf.get_variable('W1', shape = (3,3,30,60), initializer= tf.contrib.layers.xavier_initializer()),
-	'wc3': tf.get_variable('W2', shape = (3,3,60,120), initializer= tf.contrib.layers.xavier_initializer()),
-	'wc4': tf.get_variable('W3', shape = (3,3,120,240), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc1': tf.get_variable('W0', shape = (3,3,3,60), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc2': tf.get_variable('W1', shape = (3,3,60,120), initializer= tf.contrib.layers.xavier_initializer()),
+	'wc3': tf.get_variable('W2', shape = (3,3,120,240), initializer= tf.contrib.layers.xavier_initializer()),
 
 	#For fully conncected
 	#Shape first parameter equals result of previous output
-	#4 by 4 image with 128 channels
-	'wd1': tf.get_variable('W4', shape = (25*11*240, 240), initializer= tf.contrib.layers.xavier_initializer()),
+	'wd1': tf.get_variable('W3', shape = (49*21*240, 240), initializer= tf.contrib.layers.xavier_initializer()),
 	# For output
-	'out': tf.get_variable('W5', shape = (240, n_classes), initializer= tf.contrib.layers.xavier_initializer())
+	'out': tf.get_variable('W4', shape = (240, n_classes), initializer= tf.contrib.layers.xavier_initializer())
 }
 
 biases = {
 	#All the biases for the NN model
 	#Just like the weights, these values must be intialized
 
-	'bc1':tf.get_variable('B0', shape = 30, initializer=tf.zeros_initializer()),
-	'bc2':tf.get_variable('B1', shape = 60, initializer=tf.zeros_initializer()),
-	'bc3':tf.get_variable('B2', shape = 120, initializer=tf.zeros_initializer()),
-	'bc4':tf.get_variable('B3', shape = 240, initializer=tf.zeros_initializer()),
+	'bc1':tf.get_variable('B0', shape = 60, initializer=tf.zeros_initializer()),
+	'bc2':tf.get_variable('B1', shape = 120, initializer=tf.zeros_initializer()),
+	'bc3':tf.get_variable('B2', shape = 240, initializer=tf.zeros_initializer()),
 
-	'bd1':tf.get_variable('B4', shape = 240, initializer=tf.zeros_initializer()),
-	'out':tf.get_variable('B5', shape = n_classes, initializer=tf.zeros_initializer())
+	'bd1':tf.get_variable('B3', shape = 240, initializer=tf.zeros_initializer()),
+	'out':tf.get_variable('B4', shape = n_classes, initializer=tf.zeros_initializer())
 }
 
 
@@ -320,16 +141,13 @@ def conv_net(x, weights, biases):
 	conv3 = conv2d(conv2, weights['wc3'], biases['bc3'])
 	conv3 = maxpool2d(conv3)
 	print (conv3.shape)
-	#Convloution layer 4
-	conv4 = conv2d(conv3, weights['wc4'], biases['bc4'])
-	conv4 = maxpool2d(conv4)
-	print (conv4.shape)
+
 	#Fully connected layer
 	# Reshapes last layer accordingly
 
-	conv4_flattened = tf.reshape(conv4,[-1, weights['wd1'].get_shape()[0]])
+	conv3_flattened = tf.reshape(conv3,[-1, weights['wd1'].get_shape()[0]])
 	#Multiplies fc1 and 'wd1' and then adds it with bias
-	fc1 = tf.add(tf.matmul(conv4_flattened, weights['wd1']),biases['bd1'])
+	fc1 = tf.add(tf.matmul(conv3_flattened, weights['wd1']),biases['bd1'])
 	#Applies relu
 	fc1 = tf.nn.relu(fc1)
 
@@ -360,47 +178,36 @@ init = tf.global_variables_initializer()
 sess = tf.Session()
 #Start computational graph
 sess.run(init)
-train_loss = []
-test_loss = []
-train_accuracy = []
-test_loss = []
-summary_writer = tf.summary.FileWriter('./Output',sess.graph)
+
+
 multiplier = 1
+
+
 
 
 #Test batch
 fake_batch_x = []
 fake_batch_y = []
-#batch_x = train_X[batch*batch_size:min((batch+1)*batch_size,len(train_X))]
 
-'''a = np.array([0,1])
-b = np.zeros((2, 2))
-b[np.arange(2), a] = 1'''
-
-#Runs backpropagation
-#Feeds placeholder x and y
-
-#puts images into fake_batch_x list
 for training_ex in range(248):
-	for insurance in range(1):
-		z = random.randint(1,156000)
+	z = random.randint(1,156000)
 
-		while not z > (151000) or not z< (155000) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence' or z%6000 < 50 or z%6000 >5970 :
-			z = random.randint(0,156000)
+	while not z > (151000) or not z< (155000) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence' or z%6000 < 50 or z%6000 >5970 :
+		z = random.randint(0,156000)
 
-		#Else it will pick one from before the new batch, therefore it can't forget old stuff
+	#Else it will pick one from before the new batch, therefore it can't forget old stuff
 
-		img = np.load('all_spectograms/img_'+str(z)+'.npy')/255
-		if (img.shape != (385,165,3)):
-			continue 
+	img = np.load('all_spectograms/img_'+str(z)+'.npy')/255
+	if (img.shape != (385,165,3)):
+		continue 
 
-		fake_batch_x.append(img)
-		fake_batch_x[training_ex] = np.reshape(fake_batch_x[training_ex], (1,385,165,3))
-		if full_script[z-1][0][-2] == '_':
-			fake_batch_y.append(Phonemes[full_script[z-1][0][:-2]])
-		else:
-			fake_batch_y.append(Phonemes[full_script[z-1][0]])
-		#print ('using frame ' + str(z) + ' and the label is ' + str(fake_batch_y[-1]))
+	fake_batch_x.append(img)
+	fake_batch_x[training_ex] = np.reshape(fake_batch_x[training_ex], (1,385,165,3))
+	if full_script[z-1][0][-2] == '_':
+		fake_batch_y.append(Phonemes[full_script[z-1][0][:-2]])
+	else:
+		fake_batch_y.append(Phonemes[full_script[z-1][0]])
+	#print ('using frame ' + str(z) + ' and the label is ' + str(fake_batch_y[-1]))
 
 print ('created fake_batch_x with a length of ' + str(len(fake_batch_x))+ ' and created fake_batch_y with a length of ' + str(len(fake_batch_y)))
 
@@ -411,88 +218,28 @@ for fake_i in range(248):
 	else:
 		batch_x = np.concatenate((batch_x, fake_batch_x[fake_i]),0)
 print ('created batch x with a shape of ' + str(batch_x.shape))
-assistant_y = np.zeros((248,41))
+assistant_y = np.zeros((248,n_classes))
 fake_batch_y = np.array(fake_batch_y)
-#print (np.arange(batch_size))
-#print (fake_batch_y)
+
+
 batch_y = assistant_y[np.arange(248),fake_batch_y] = 1
 batch_y = assistant_y
 
 test_batch_y = batch_y
 test_batch_x = batch_x
-#print (batch_y)
+
+
+
 
 
 test_losses = []
 test_accs = []
 for i in range(training_iter):
 	for batch in range(0,1280//batch_size):
-		if batch%1 == 0:
-			fake_batch_x = []
-			fake_batch_y = []
-			#batch_x = train_X[batch*batch_size:min((batch+1)*batch_size,len(train_X))]
-
-			'''a = np.array([0,1])
-			b = np.zeros((2, 2))
-			b[np.arange(2), a] = 1'''
-
-			#Runs backpropagation
-			#Feeds placeholder x and y
-
-			#puts images into fake_batch_x list
-			for training_ex in range(batch_size):
-				z = random.randint(1,156000)
-
-				#75% chance that the training example comes from the new batch introduced
-				if random.randint(1,4) >=2 and multiplier>1:
-					while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or z%6000 < 50 or z%6000 >5970 or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
-						z = random.randint(0,156000)
-					#print ('first for loop')
-					#print (z)
-				#Else it will pick one from before the new batch, therefore it can't forget old stuff
-				elif multiplier>1:
-					while not z > 100 or not z< ((3000*multiplier)-3000) or  z%6000 < 50 or z%6000 >5970 or  full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
-						z = random.randint(0,156000)
-					#print ('second for loop')
-					#print (z)
-				else:
-					while not z > ((3000*multiplier)-2900) or not z< ((3000*multiplier)-100) or full_script[z-1][0] == 'oov' or full_script[z-1][0] == 'not-found-in-audio' or full_script[z-1][0] == 'silence':
-						z = random.randint(0,156000)
-					#print ('third for loop')
-					#print (z)
-				img = np.load('all_spectograms/img_'+str(z)+'.npy')/255
+		batch_x , batch_y = CreateBatch(batch_size,multiplier, full_script, Phonemes, n_classes, batch)
 
 
-				fake_batch_x.append(img)
-				try:
-					fake_batch_x[-1] = np.reshape(fake_batch_x[-1], (1,385,165,3))
-				except Exception as e:
-					print (e)
-					print (training_ex)
-					print (len(fake_batch_x))
-					print (z)
-				if full_script[z-1][0][-2] == '_':
-					fake_batch_y.append(Phonemes[full_script[z-1][0][:-2]])
-				else:
-					fake_batch_y.append(Phonemes[full_script[z-1][0]])
-					#print ('using frame ' + str(z) + ' and the label is ' + str(fake_batch_y[-1]))
 
-			print ('created fake_batch_x with a length of ' + str(len(fake_batch_x))+ ' and created fake_batch_y with a length of ' + str(len(fake_batch_y)) + ' for batch ' + str(batch))
-
-			#batch_x is defined as a numpy array of fake_batch_x		
-			for fake_i in range(batch_size):
-				if fake_i == 0:
-					batch_x = np.array(fake_batch_x[0])
-				else:
-					batch_x = np.concatenate((batch_x, fake_batch_x[fake_i]),0)
-			print ('created batch x with a shape of ' + str(batch_x.shape))
-			assistant_y = np.zeros((batch_size,41))
-			fake_batch_y = np.array(fake_batch_y)
-			#print (np.arange(batch_size))
-			#print (fake_batch_y)
-			batch_y = assistant_y[np.arange(batch_size),fake_batch_y] = 1
-			batch_y = assistant_y
-			#print (batch_y)
 		print ('running batch x for batch num: ' +str(batch))
 		opt = sess.run(optimizer, feed_dict = {x:batch_x, y:batch_y})
 		prediction = sess.run(pred, feed_dict = {x:batch_x})
@@ -502,23 +249,24 @@ for i in range(training_iter):
 			np.save('weight_1.npy', sess.run(weights['wc1']))
 			np.save('weight_2.npy', sess.run(weights['wc2']))
 			np.save('weight_3.npy', sess.run(weights['wc3']))
-			np.save('weight_4.npy', sess.run(weights['wc4']))
 			np.save('weight_wd1.npy', sess.run(weights['wd1']))
 			np.save('weight_out.npy', sess.run(weights['out']))
 			np.save('bias_1.npy', sess.run(biases['bc1']))
 			np.save('bias_2.npy', sess.run(biases['bc2']))
 			np.save('bias_3.npy', sess.run(biases['bc3']))
-			np.save('bias_4.npy', sess.run(biases['bc4']))
 			np.save('bias_wd1.npy', sess.run(biases['bd1']))
 			np.save('bias_out.npy', sess.run(biases['out']))
 		print ('finished batch number ' + str(batch))
 		print ('\n')
+	batch = 'training batch'
 	#Loss and accuracy for train set
 	#FIX THIS!
 	#FIX THIS!
 	#FIX THIS!
 	#More than just batch
-	loss, acc = sess.run([cost, accuracy], feed_dict={x:batch_x, y:batch_y})
+	train_batch_x , train_batch_y = CreateBatch(batch_size,multiplier, full_script, Phonemes, n_classes, batch)
+	loss, acc = sess.run([cost, accuracy], feed_dict={x:train_batch_x, y:train_batch_y})
+	
 	test_loss,test_acc = sess.run([cost, accuracy], feed_dict={x:test_batch_x, y:test_batch_y})
 	test_losses.append(test_loss)
 	test_accs.append(test_acc)
