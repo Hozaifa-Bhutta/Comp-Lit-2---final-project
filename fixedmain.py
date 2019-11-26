@@ -2,7 +2,7 @@
 #YOU WERE WORKING ON CHANGING THE MODEL
 #This should be the main model where the training occurs
 # Import libraries
-import cv2
+
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -17,6 +17,8 @@ import csv
 import pandas as pd
 from create_batch import CreateBatch
 import sys
+from numba import jit, cuda 
+
 np.set_printoptions(threshold=sys.maxsize)
 
 #Maximum is 255
@@ -37,7 +39,7 @@ learning_rate = 0.001
 batch_size = 64
 
 #Number of classes - 41 in real dataset
-n_classes = 39
+n_classes = 40
 n_channels = 3
 #two placeholders, x and y
 #First value is left as 'None' as it'll be defined later on as 'batch_size'
@@ -50,7 +52,7 @@ y = tf.placeholder('float', [None, n_classes])
 Phonemes = {}
 full_script = []
 for i in range(1,27):
-	with open('labels/min_' + str(i) + '.csv', 'r') as f:
+	with open('CSV_files/min_' + str(i) + '.csv', 'r') as f:
 		reader = csv.reader(f)
 		list_min = list(reader)
 		full_script += list_min
@@ -58,19 +60,24 @@ for i in range(1,27):
 
 number = 0
 for i in full_script:
-	if number ==39:
+	if number ==40:
 		break
 
 	if i[0][-2] == '_':
 		if (i)[0][:-2] not in Phonemes:
 			Phonemes[(i)[0][:-2]] = number
 			number += 1
-	elif i[0] == 'silence' or i[0] == 'not-found-in-audio' or i[0] == 'oov':
+	if i[0] == 'silence':
+		if (i)[0] not in Phonemes:
+			Phonemes[(i)[0]] = number
+			number += 1
+
+	else:
 		pass
 
 
-
-
+print (len(full_script))
+print (Phonemes)
 
 #
 def conv2d(x, W, b, stride = 1):
@@ -188,7 +195,7 @@ multiplier = 1
 #Test batch
 fake_batch_x = []
 fake_batch_y = []
-
+'''
 for training_ex in range(248):
 	z = random.randint(1,156000)
 
@@ -202,6 +209,8 @@ for training_ex in range(248):
 		continue 
 
 	fake_batch_x.append(img)
+	print (len(fake_batch_x))
+	exit()
 	fake_batch_x[training_ex] = np.reshape(fake_batch_x[training_ex], (1,385,165,3))
 	if full_script[z-1][0][-2] == '_':
 		fake_batch_y.append(Phonemes[full_script[z-1][0][:-2]])
@@ -226,14 +235,13 @@ batch_y = assistant_y[np.arange(248),fake_batch_y] = 1
 batch_y = assistant_y
 
 test_batch_y = batch_y
-test_batch_x = batch_x
+test_batch_x = batch_x'''
 
 
 
 
 
-test_losses = []
-test_accs = []
+#with tf.device('/gpu:0'):
 for i in range(training_iter):
 	for batch in range(0,1280//batch_size):
 		batch_x , batch_y = CreateBatch(batch_size,multiplier, full_script, Phonemes, n_classes, batch)
@@ -264,12 +272,12 @@ for i in range(training_iter):
 	#FIX THIS!
 	#FIX THIS!
 	#More than just batch
-	train_batch_x , train_batch_y = CreateBatch(batch_size,multiplier, full_script, Phonemes, n_classes, batch)
-	loss, acc = sess.run([cost, accuracy], feed_dict={x:train_batch_x, y:train_batch_y})
+	#train_batch_x , train_batch_y = CreateBatch(batch_size,multiplier, full_script, Phonemes, n_classes, batch)
+	loss, acc = sess.run([cost, accuracy], feed_dict={x:batch_x, y:batch_y})
 	
-	test_loss,test_acc = sess.run([cost, accuracy], feed_dict={x:test_batch_x, y:test_batch_y})
-	test_losses.append(test_loss)
-	test_accs.append(test_acc)
+	#test_loss,test_acc = sess.run([cost, accuracy], feed_dict={x:test_batch_x, y:test_batch_y})
+	#test_losses.append(test_loss)
+	#test_accs.append(test_acc)
 	#Loss and accuracy for test set
 	#test_loss, valid_acc = sess.run([cost,accuracy], feed_dict={x:test_X,y:test_y})
 	print ('\n\n\n')
@@ -278,12 +286,11 @@ for i in range(training_iter):
 	print ('Training Loss: ' + str(loss))
 	print ('Training Accuracy: ' + str(acc))
 	print ('Multiplier: ' + str(multiplier))
-	print ('Testing Loss: ' + str(test_loss))
-	print ('Testing Accuracy: ' + str(test_acc))
-	if i%10 ==0:
-		print (test_losses)
-		print (test_accs)
-	print (z)
+	#print ('Testing Loss: ' + str(test_loss))
+	#print ('Testing Accuracy: ' + str(test_acc))
+	#if i%10 ==0:
+	#	print (test_losses)
+	#	print (test_accs)
 	print ('\n\n\n')
 	if acc >0.92:
 		try:
